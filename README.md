@@ -9,3 +9,9 @@ There is a handy mix task to start a Monkey REPL
 ```
 mix repl
 ```
+
+## Running the tests
+
+```
+mix test
+```
