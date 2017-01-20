@@ -4,6 +4,7 @@ defmodule Monkey.EvaluatorTest do
   alias Monkey.Ast.Node
   alias Monkey.Evaluator
   alias Monkey.Lexer
+  alias Monkey.Object.Array
   alias Monkey.Object.Boolean
   alias Monkey.Object.Environment
   alias Monkey.Object.Error
@@ -294,6 +295,44 @@ defmodule Monkey.EvaluatorTest do
         is_bitstring(expected) ->
           assert %Error{} = evaluated
           assert evaluated.message == expected
+      end
+    end)
+  end
+
+  test "array literals" do
+    input = "[1, 2 * 2, 3 + 3]"
+    array = test_eval(input)
+
+    assert %Array{} = array
+    assert length(array.elements) == 3
+
+    test_integer_object(Enum.at(array.elements, 0), 1)
+    test_integer_object(Enum.at(array.elements, 1), 4)
+    test_integer_object(Enum.at(array.elements, 2), 6)
+  end
+
+  test "array index expressions" do
+    values = [
+      {"[1, 2, 3][0]", 1},
+      {"[1, 2, 3][1]", 2},
+      {"[1, 2, 3][2]", 3},
+      {"let i = 0; [1][i];", 1},
+      {"[1, 2, 3][1 + 1];", 3},
+      {"let myArray = [1, 2, 3]; myArray[2];", 3},
+      {"let myArray = [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];", 6},
+      {"let myArray = [1, 2, 3]; let i = myArray[0]; myArray[i]", 2},
+      {"[1, 2, 3][3]", nil},
+      {"[1, 2, 3][-1]", nil}
+    ]
+
+    Enum.each(values, fn({input, expected}) ->
+      evaluated = test_eval(input)
+
+      cond do
+        is_integer(expected) ->
+          test_integer_object(evaluated, expected)
+        true ->
+          assert %Null{} = evaluated
       end
     end)
   end

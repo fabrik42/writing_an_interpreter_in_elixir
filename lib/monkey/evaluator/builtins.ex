@@ -11,6 +11,9 @@ defmodule Monkey.Evaluator.Builtins do
       %Monkey.Object.String{} ->
         result = String.length(arg.value)
         %Monkey.Object.Integer{value: result}
+      %Monkey.Object.Array{} ->
+        result = length(arg.elements)
+        %Monkey.Object.Integer{value: result}
       _ ->
         error("argument to `len` not supported, got #{Object.type(arg)}")
     end

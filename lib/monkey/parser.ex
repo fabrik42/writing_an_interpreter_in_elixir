@@ -1,4 +1,5 @@
 defmodule Monkey.Parser do
+  alias Monkey.Ast.ArrayLiteral
   alias Monkey.Ast.BlockStatement
   alias Monkey.Ast.Boolean
   alias Monkey.Ast.CallExpression
@@ -6,6 +7,7 @@ defmodule Monkey.Parser do
   alias Monkey.Ast.FunctionLiteral
   alias Monkey.Ast.Identifier
   alias Monkey.Ast.IfExpression
+  alias Monkey.Ast.IndexExpression
   alias Monkey.Ast.InfixExpression
   alias Monkey.Ast.IntegerLiteral
   alias Monkey.Ast.LetStatement
@@ -26,7 +28,8 @@ defmodule Monkey.Parser do
     sum: 3,
     product: 4,
     prefix: 5,
-    call: 6
+    call: 6,
+    index: 7
   }
 
   @precedences %{
@@ -38,7 +41,8 @@ defmodule Monkey.Parser do
     minus: @precedence_levels.sum,
     slash: @precedence_levels.product,
     asterisk: @precedence_levels.product,
-    lparen: @precedence_levels.call
+    lparen: @precedence_levels.call,
+    lbracket: @precedence_levels.index
   }
 
   def from_tokens(tokens) do
@@ -146,6 +150,7 @@ defmodule Monkey.Parser do
   defp prefix_parse_fns(:if, p), do: parse_if_expression(p)
   defp prefix_parse_fns(:function, p), do: parse_function_literal(p)
   defp prefix_parse_fns(:string, p), do: parse_string_literal(p)
+  defp prefix_parse_fns(:lbracket, p), do: parse_array_literal(p)
   defp prefix_parse_fns(_, p) do
     error = "No prefix function found for #{p.curr.type}"
     p = add_error(p, error)
@@ -288,6 +293,13 @@ defmodule Monkey.Parser do
     {p, expression}
   end
 
+  defp parse_array_literal(p) do
+    token = p.curr
+    {p, elements} = parse_expression_list(p, :rbracket)
+    array = %ArrayLiteral{token: token, elements: elements}
+    {p, array}
+  end
+
   defp infix_parse_fns(:plus), do: &(parse_infix_expression(&1, &2))
   defp infix_parse_fns(:minus), do: &(parse_infix_expression(&1, &2))
   defp infix_parse_fns(:slash), do: &(parse_infix_expression(&1, &2))
@@ -297,6 +309,7 @@ defmodule Monkey.Parser do
   defp infix_parse_fns(:lt), do: &(parse_infix_expression(&1, &2))
   defp infix_parse_fns(:gt), do: &(parse_infix_expression(&1, &2))
   defp infix_parse_fns(:lparen), do: &(parse_call_expression(&1, &2))
+  defp infix_parse_fns(:lbracket), do: &(parse_index_expression(&1, &2))
   defp infix_parse_fns(_), do: nil
 
   defp parse_infix_expression(p, left) do
@@ -313,19 +326,31 @@ defmodule Monkey.Parser do
 
   defp parse_call_expression(p, function) do
     token = p.curr
-    {p, arguments} = parse_call_arguments(p)
+    {p, arguments} = parse_expression_list(p, :rparen)
     expression = %CallExpression{token: token, function: function, arguments: arguments}
     {p, expression}
   end
 
-  defp parse_call_arguments(p, arguments \\ []) do
-    do_parse_call_arguments(p, arguments)
+  def parse_index_expression(p, left) do
+    token = p.curr
+    p = next_token(p)
+    {_, p, index} = parse_expression(p, @precedence_levels.lowest)
+    expression = %IndexExpression{token: token, left: left, index: index}
+
+    case expect_peek(p, :rbracket) do
+      {:ok, p, _peek} -> {p, expression}
+      {:error, p, nil} -> {p, nil}
+    end
   end
-  defp do_parse_call_arguments(%Parser{peek: %Token{type: :rparen}} = p, [] = arguments) do
+
+  defp parse_expression_list(p, end_token, arguments \\ []) do
+    do_parse_expression_list(p, end_token, arguments)
+  end
+  defp do_parse_expression_list(%Parser{peek: %Token{type: end_token}} = p, end_token, [] = arguments) do
     p = next_token(p)
     {p, arguments}
   end
-  defp do_parse_call_arguments(p, arguments) do
+  defp do_parse_expression_list(p, end_token, arguments) do
     p = next_token(p)
     {_, p, argument} = parse_expression(p, @precedence_levels.lowest)
     arguments = arguments ++ [argument]
@@ -333,10 +358,10 @@ defmodule Monkey.Parser do
     case p.peek.type do
       :comma ->
         p = next_token(p)
-        do_parse_call_arguments(p, arguments)
+        do_parse_expression_list(p, end_token, arguments)
       _ ->
         # TODO: no nested case please!
-        case expect_peek(p, :rparen) do
+        case expect_peek(p, end_token) do
           {:ok, p, _peek} -> {p, arguments}
           {:error, p, nil} -> {p, nil}
         end

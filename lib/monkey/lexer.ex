@@ -72,6 +72,8 @@ defmodule Monkey.Lexer do
       "," -> %Token{type: :comma, literal: ch}
       "{" -> %Token{type: :lbrace, literal: ch}
       "}" -> %Token{type: :rbrace, literal: ch}
+      "[" -> %Token{type: :lbracket, literal: ch}
+      "]" -> %Token{type: :rbracket, literal: ch}
       _ -> %Token{type: :illegal, literal: ""}
     end
 

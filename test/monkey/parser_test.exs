@@ -1,11 +1,13 @@
 defmodule Monkey.ParserTest do
   use ExUnit.Case
+  alias Monkey.Ast.ArrayLiteral
   alias Monkey.Ast.Boolean
   alias Monkey.Ast.CallExpression
   alias Monkey.Ast.ExpressionStatement
   alias Monkey.Ast.FunctionLiteral
   alias Monkey.Ast.Identifier
   alias Monkey.Ast.IfExpression
+  alias Monkey.Ast.IndexExpression
   alias Monkey.Ast.InfixExpression
   alias Monkey.Ast.IntegerLiteral
   alias Monkey.Ast.LetStatement
@@ -62,6 +64,7 @@ defmodule Monkey.ParserTest do
     parser = Parser.from_tokens(tokens)
     {parser, program} = Parser.parse_program(parser)
 
+    if length(parser.errors) > 0, do: IO.inspect(parser.errors)
     assert length(parser.errors) == 0
 
     {parser, program}
@@ -214,7 +217,9 @@ defmodule Monkey.ParserTest do
 		  {"!(true == true)", "(!(true == true))"},
 		  {"a + add(b * c) + d", "((a + add((b * c))) + d)"},
 		  {"add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"},
-		  {"add(a + b + c * d / f + g)", "add((((a + b) + ((c * d) / f)) + g))"}
+		  {"add(a + b + c * d / f + g)", "add((((a + b) + ((c * d) / f)) + g))"},
+      {"a * [1, 2, 3, 4][b * c] * d", "((a * ([1, 2, 3, 4][(b * c)])) * d)"},
+      {"add(a * b[2], b[1], 2 * [1, 2][1])", "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"}
     ]
 
     Enum.each(values, fn({input, expected}) ->
@@ -362,5 +367,52 @@ defmodule Monkey.ParserTest do
     expression = statement.expression
     assert %StringLiteral{} = expression
     assert expression.value == "hello world"
+  end
+
+  test "parse empty array literal" do
+    input = "[]"
+
+    {_, program} = parse_input(input)
+    assert length(program.statements) == 1
+
+    statement = Enum.at(program.statements, 0)
+    assert %ExpressionStatement{} = statement
+
+    array = statement.expression
+    assert %ArrayLiteral{} = array
+    assert length(array.elements) == 0
+  end
+
+  test "parse array literal" do
+    input = "[1, 2 + 2, 3 * 3]"
+
+    {_, program} = parse_input(input)
+    assert length(program.statements) == 1
+
+    statement = Enum.at(program.statements, 0)
+    assert %ExpressionStatement{} = statement
+
+    array = statement.expression
+    assert %ArrayLiteral{} = array
+    assert length(array.elements) == 3
+
+    test_integer_literal(Enum.at(array.elements, 0), 1)
+    test_infix_expression(Enum.at(array.elements, 1), 2, "+", 2)
+    test_infix_expression(Enum.at(array.elements, 2), 3, "*", 3)
+  end
+
+  test "parse index expression" do
+    input = "myArray[1 + 1]"
+
+    {_, program} = parse_input(input)
+    assert length(program.statements) == 1
+
+    statement = Enum.at(program.statements, 0)
+    assert %ExpressionStatement{} = statement
+
+    index = statement.expression
+    assert %IndexExpression{} = index
+    test_identifier(index.left, "myArray")
+    test_infix_expression(index.index, 1, "+", 1)
   end
 end

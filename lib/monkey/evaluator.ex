@@ -1,10 +1,12 @@
 defmodule Monkey.Evaluator do
+  alias Monkey.Ast.ArrayLiteral
   alias Monkey.Ast.BlockStatement
   alias Monkey.Ast.CallExpression
   alias Monkey.Ast.ExpressionStatement
   alias Monkey.Ast.FunctionLiteral
   alias Monkey.Ast.Identifier
   alias Monkey.Ast.IfExpression
+  alias Monkey.Ast.IndexExpression
   alias Monkey.Ast.InfixExpression
   alias Monkey.Ast.IntegerLiteral
   alias Monkey.Ast.LetStatement
@@ -13,6 +15,7 @@ defmodule Monkey.Evaluator do
   alias Monkey.Ast.ReturnStatement
   alias Monkey.Ast.StringLiteral
   alias Monkey.Evaluator.Builtins
+  alias Monkey.Object.Array
   alias Monkey.Object.Boolean
   alias Monkey.Object.Builtin
   alias Monkey.Object.Environment
@@ -117,6 +120,29 @@ defmodule Monkey.Evaluator do
           value = apply_function(function, args)
           {value, env}
         end
+    end
+  end
+  def eval(%ArrayLiteral{} = node, env) do
+    {elements, env} = eval_expressions(node.elements, env)
+
+    if length(elements) == 1 && is_error(Enum.at(elements, 0)) do
+      value = Enum.at(elements, 0)
+      {value, env}
+    else
+      value = %Array{elements: elements}
+      {value, env}
+    end
+  end
+  def eval(%IndexExpression{} = node, env) do
+    {left, env} = eval(node.left, env)
+    {index, env} = eval(node.index, env)
+
+    cond do
+      is_error(left) -> {left, env}
+      is_error(index) -> {index, env}
+      true ->
+        value = eval_index_expression(left, index)
+        {value, env}
     end
   end
 
@@ -235,6 +261,20 @@ defmodule Monkey.Evaluator do
       is_truthy(condition) -> eval(expression.consequence, env)
       expression.alternative != nil -> eval(expression.alternative, env)
       true -> {@cached_null, env}
+    end
+  end
+
+  defp eval_index_expression(%Array{} = left, %Integer{} = index),
+    do: eval_array_index_expression(left, index)
+  defp eval_index_expression(left, _),
+    do: error("index operator not supported: #{Object.type(left)}")
+
+  defp eval_array_index_expression(array, index) do
+    idx = index.value
+
+    cond do
+      idx < 0 -> @cached_null
+      true -> Enum.at(array.elements, idx, @cached_null)
     end
   end
 
