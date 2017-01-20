@@ -13,6 +13,7 @@ defmodule Monkey.ParserTest do
   alias Monkey.Ast.PrefixExpression
   alias Monkey.Ast.Program
   alias Monkey.Ast.ReturnStatement
+  alias Monkey.Ast.StringLiteral
   alias Monkey.Lexer
   alias Monkey.Parser
 
@@ -347,5 +348,19 @@ defmodule Monkey.ParserTest do
     test_literal_expression(Enum.at(expression.arguments, 0), 1)
     test_infix_expression(Enum.at(expression.arguments, 1), 2, "*", 3)
     test_infix_expression(Enum.at(expression.arguments, 2), 4, "+", 5)
+  end
+
+  test "parse string literal expression" do
+    input = "\"hello world\";"
+
+    {_, program} = parse_input(input)
+    assert length(program.statements) == 1
+
+    statement = Enum.at(program.statements, 0)
+    assert %ExpressionStatement{} = statement
+
+    expression = statement.expression
+    assert %StringLiteral{} = expression
+    assert expression.value == "hello world"
   end
 end

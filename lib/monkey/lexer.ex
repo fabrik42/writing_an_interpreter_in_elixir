@@ -16,6 +16,7 @@ defmodule Monkey.Lexer do
       is_letter(ch) -> read_identifier(chars, tokens)
       is_digit(ch) -> read_number(chars, tokens)
       is_two_char_operator(chars) -> read_two_char_operator(chars, tokens)
+      is_quote(ch) -> read_string(chars, tokens)
       true -> read_next_char(chars, tokens)
     end
   end
@@ -43,6 +44,14 @@ defmodule Monkey.Lexer do
       "==" -> %Token{type: :eq, literal: literal}
       "!=" -> %Token{type: :not_eq, literal: literal}
     end
+
+    tokenize(rest, tokens ++ [token])
+  end
+
+  def read_string([_quote | rest], tokens) do
+    {string, [_quote | rest]} = Enum.split_while(rest, &(!is_quote(&1)))
+    string = Enum.join(string)
+    token = %Token{type: :string, literal: string}
 
     tokenize(rest, tokens ++ [token])
   end
@@ -80,6 +89,8 @@ defmodule Monkey.Lexer do
   defp is_whitespace(ch) do
     ch == " " || ch == "\n" || ch == "\t"
   end
+
+  defp is_quote(ch), do: ch == "\""
 
   defp is_two_char_operator(chars) do
     (Enum.at(chars, 0) == "!" || Enum.at(chars, 0) == "=") && Enum.at(chars, 1) == "="

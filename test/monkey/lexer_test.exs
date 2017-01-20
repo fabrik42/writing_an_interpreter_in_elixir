@@ -48,6 +48,8 @@ defmodule Monkey.LexerTest do
 
     10 == 10;
     10 != 9;
+    "foobar"
+    "foo bar"
     """
 
     expected = [
@@ -124,6 +126,8 @@ defmodule Monkey.LexerTest do
       %Token{type: :not_eq, literal: "!="},
       %Token{type: :int, literal: "9"},
       %Token{type: :semicolon, literal: ";"},
+      %Token{type: :string, literal: "foobar"},
+      %Token{type: :string, literal: "foo bar"},
       %Token{type: :eof, literal: ""}
     ]
 

@@ -11,7 +11,10 @@ defmodule Monkey.Evaluator do
   alias Monkey.Ast.PrefixExpression
   alias Monkey.Ast.Program
   alias Monkey.Ast.ReturnStatement
+  alias Monkey.Ast.StringLiteral
+  alias Monkey.Evaluator.Builtins
   alias Monkey.Object.Boolean
+  alias Monkey.Object.Builtin
   alias Monkey.Object.Environment
   alias Monkey.Object.Error
   alias Monkey.Object.Function
@@ -19,6 +22,7 @@ defmodule Monkey.Evaluator do
   alias Monkey.Object.Null
   alias Monkey.Object.Object
   alias Monkey.Object.ReturnValue
+  alias Monkey.Object.String
 
   @cached_true %Boolean{value: true}
   @cached_false %Boolean{value: false}
@@ -52,6 +56,10 @@ defmodule Monkey.Evaluator do
     value = from_native_bool(node.value)
     {value, env}
   end
+  def eval(%StringLiteral{} = node, env) do
+    value = %String{value: node.value}
+    {value, env}
+  end
   def eval(%PrefixExpression{} = node, env) do
     {right, env} = eval(node.right, env)
     cond do
@@ -81,9 +89,11 @@ defmodule Monkey.Evaluator do
   end
   def eval(%Identifier{} = node, env) do
     value = Environment.get(env, node.value)
-    case value do
-      nil -> {error("identifier not found: #{node.value}"), env}
-      _ -> {value, env}
+    builtin = Builtins.get(node.value)
+    cond do
+      value -> {value, env}
+      builtin -> {builtin, env}
+      true -> {error("identifier not found: #{node.value}"), env}
     end
   end
   def eval(%FunctionLiteral{} = node, env) do
@@ -177,6 +187,8 @@ defmodule Monkey.Evaluator do
 
   defp eval_infix_expression(operator, %Integer{} = left, %Integer{} = right),
     do: eval_integer_infix_expression(operator, left, right)
+  defp eval_infix_expression(operator, %String{} = left, %String{} = right),
+    do: eval_string_infix_expression(operator, left, right)
   defp eval_infix_expression("==", left, right),
     do: from_native_bool(left == right)
   defp eval_infix_expression("!=", left, right),
@@ -208,6 +220,13 @@ defmodule Monkey.Evaluator do
     end
   end
 
+  defp eval_string_infix_expression(operator, left, right) do
+    case operator do
+      "+" -> %String{value: left.value <> right.value}
+      _ -> error("unknown operator: #{Object.type(left)} #{operator} #{Object.type(right)}")
+    end
+  end
+
   defp eval_if_expression(expression, env) do
     {condition, env} = eval(expression.condition, env)
 
@@ -219,11 +238,14 @@ defmodule Monkey.Evaluator do
     end
   end
 
-  defp apply_function(function, args) do
+  defp apply_function(%Function{} = function, args) do
     extended_env = extended_function_env(function, args)
     {value, _env} = eval(function.body, extended_env)
     unwrap_return_value(value)
   end
+  defp apply_function(%Builtin{} = function, args), do: function.fn.(args)
+  defp apply_function(function, _),
+    do: error("not a function: #{Object.type(function)}")
 
   defp extended_function_env(function, args) do
     env = Environment.build_enclosed(function.environment)

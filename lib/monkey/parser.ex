@@ -12,6 +12,7 @@ defmodule Monkey.Parser do
   alias Monkey.Ast.PrefixExpression
   alias Monkey.Ast.Program
   alias Monkey.Ast.ReturnStatement
+  alias Monkey.Ast.StringLiteral
   alias Monkey.Parser
   alias Monkey.Token
 
@@ -144,6 +145,7 @@ defmodule Monkey.Parser do
   defp prefix_parse_fns(:lparen, p), do: parse_grouped_expression(p)
   defp prefix_parse_fns(:if, p), do: parse_if_expression(p)
   defp prefix_parse_fns(:function, p), do: parse_function_literal(p)
+  defp prefix_parse_fns(:string, p), do: parse_string_literal(p)
   defp prefix_parse_fns(_, p) do
     error = "No prefix function found for #{p.curr.type}"
     p = add_error(p, error)
@@ -279,6 +281,11 @@ defmodule Monkey.Parser do
 
     p = next_token(p)
     do_parse_block_statement(p, token, statements)
+  end
+
+  defp parse_string_literal(p) do
+    expression = %StringLiteral{token: p.curr, value: p.curr.literal}
+    {p, expression}
   end
 
   defp infix_parse_fns(:plus), do: &(parse_infix_expression(&1, &2))

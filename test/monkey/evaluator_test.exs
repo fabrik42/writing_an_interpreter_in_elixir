@@ -10,6 +10,7 @@ defmodule Monkey.EvaluatorTest do
   alias Monkey.Object.Function
   alias Monkey.Object.Integer
   alias Monkey.Object.Null
+  alias Monkey.Object.String
   alias Monkey.Parser
 
   def test_eval(input) do
@@ -191,6 +192,10 @@ defmodule Monkey.EvaluatorTest do
       {
         "foobar",
         "identifier not found: foobar",
+      },
+      {
+        ~s("Hello" - "World"),
+        "unknown operator: STRING - STRING"
       }
     ]
 
@@ -253,5 +258,43 @@ defmodule Monkey.EvaluatorTest do
 
     evaluated = test_eval(input)
     test_integer_object(evaluated, 4)
+  end
+
+  test "string literal" do
+    input = ~s("Hello World!")
+    string = test_eval(input)
+
+    assert %String{} = string
+    assert string.value == "Hello World!"
+  end
+
+  test "string concatenation" do
+    input = ~s("Hello" + " " + "World!")
+    string = test_eval(input)
+
+    assert %String{} = string
+    assert string.value == "Hello World!"
+  end
+
+  test "builtin functions" do
+    values = [
+      {~s/len("")/, 0},
+      {~s/len("four")/, 4},
+      {~s/len("hello world")/, 11},
+      {~s/len(1)/, "argument to `len` not supported, got INTEGER"},
+      {~s/len("one", "two")/, "wrong number of arguments. got=2, want=1"}
+    ]
+
+    Enum.each(values, fn({input, expected}) ->
+      evaluated = test_eval(input)
+
+      cond do
+        is_integer(expected) ->
+          test_integer_object(evaluated, expected)
+        is_bitstring(expected) ->
+          assert %Error{} = evaluated
+          assert evaluated.message == expected
+      end
+    end)
   end
 end

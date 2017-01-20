@@ -15,6 +15,7 @@ defmodule Monkey.Token do
            # identifiers and literals
            ident: "IDENT", # add, foobar, x, y, ...
            int: "INT", # 123
+           string: "STRING",
            # operators
            assign: "=",
            plus: "+",

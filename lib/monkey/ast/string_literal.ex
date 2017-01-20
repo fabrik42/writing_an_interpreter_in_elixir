@@ -1,4 +1,4 @@
-defmodule Monkey.Ast.IntegerLiteral do
+defmodule Monkey.Ast.StringLiteral do
   alias Monkey.Ast.Node
 
   @enforce_keys [:token, :value]
