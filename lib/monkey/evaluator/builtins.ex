@@ -3,10 +3,7 @@ defmodule Monkey.Evaluator.Builtins do
   alias Monkey.Object.Error
   alias Monkey.Object.Object
 
-  def get("len") do
-    %Builtin{fn: &len/1}
-  end
-
+  def get("len"), do: %Builtin{fn: &len/1}
   def get(_), do: nil
 
   def len([arg] = args) when length(args) == 1 do
