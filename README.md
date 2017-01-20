@@ -15,3 +15,9 @@ mix repl
 ```
 mix test
 ```
+
+## Notable changes to the original Golang implementation
+
+### Lexer
+
+* Does not maintain state and is implemented using recursive function calls.

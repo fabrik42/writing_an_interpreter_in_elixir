@@ -1,8 +1,7 @@
 defmodule Monkey.LexerTest do
   use ExUnit.Case
-  alias Monkey.Token
 
-  doctest Monkey.Lexer
+  alias Monkey.Token
 
   test "converts a string into a list of tokens" do
     input = "=+(){},;"
@@ -19,7 +18,7 @@ defmodule Monkey.LexerTest do
       %Token{type: :eof, literal: ""}
     ]
 
-    tokens = Monkey.Lexer.from_string(input)
+    tokens = Monkey.Lexer.tokenize(input)
 
 
     assert length(tokens) == length(expected)
@@ -128,7 +127,7 @@ defmodule Monkey.LexerTest do
       %Token{type: :eof, literal: ""}
     ]
 
-    tokens = Monkey.Lexer.from_string(input)
+    tokens = Monkey.Lexer.tokenize(input)
 
     assert length(tokens) == length(expected)
 

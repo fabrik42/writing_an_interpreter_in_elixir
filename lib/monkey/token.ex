@@ -46,5 +46,4 @@ defmodule Monkey.Token do
   def lookup_ident(ident) do
     Map.get(@keywords, ident, :ident)
   end
-
 end

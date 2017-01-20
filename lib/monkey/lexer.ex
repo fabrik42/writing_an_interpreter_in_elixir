@@ -1,18 +1,18 @@
 defmodule Monkey.Lexer do
   alias Monkey.Token
 
-  def from_string(input) do
+  def tokenize(input) do
     chars = String.split(input, "", trim: true)
-    from_string(chars, [])
+    tokenize(chars, [])
   end
 
-  defp from_string(_chars = [], tokens) do
+  defp tokenize(_chars = [], tokens) do
     tokens ++ [%Token{type: :eof, literal: ""}]
   end
 
-  defp from_string(chars = [ch | rest], tokens) do
+  defp tokenize(chars = [ch | rest], tokens) do
     cond do
-      is_whitespace(ch) -> from_string(rest, tokens)
+      is_whitespace(ch) -> tokenize(rest, tokens)
       is_letter(ch) -> read_identifier(chars, tokens)
       is_digit(ch) -> read_number(chars, tokens)
       is_two_char_operator(chars) -> read_two_char_operator(chars, tokens)
@@ -25,7 +25,7 @@ defmodule Monkey.Lexer do
     identifier = Enum.join(identifier)
     token = %Token{type: Token.lookup_ident(identifier), literal: identifier}
 
-    from_string(rest, tokens ++ [token])
+    tokenize(rest, tokens ++ [token])
   end
 
   defp read_number(chars, tokens) do
@@ -33,7 +33,7 @@ defmodule Monkey.Lexer do
     number = Enum.join(number)
     token = %Token{type: :int, literal: number}
 
-    from_string(rest, tokens ++ [token])
+    tokenize(rest, tokens ++ [token])
   end
 
   defp read_two_char_operator(chars, tokens) do
@@ -44,7 +44,7 @@ defmodule Monkey.Lexer do
       "!=" -> %Token{type: :not_eq, literal: literal}
     end
 
-    from_string(rest, tokens ++ [token])
+    tokenize(rest, tokens ++ [token])
   end
 
   defp read_next_char(_chars = [ch | rest], tokens) do
@@ -66,7 +66,7 @@ defmodule Monkey.Lexer do
       _ -> %Token{type: :illegal, literal: ""}
     end
 
-    from_string(rest, tokens ++ [token])
+    tokenize(rest, tokens ++ [token])
   end
 
   defp is_letter(ch) do
