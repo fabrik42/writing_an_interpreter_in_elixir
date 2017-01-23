@@ -1,9 +1,11 @@
 defmodule Monkey.Evaluator.Builtins do
   alias Monkey.Object.Builtin
   alias Monkey.Object.Error
+  alias Monkey.Object.Null
   alias Monkey.Object.Object
 
   def get("len"), do: %Builtin{fn: &len/1}
+  def get("puts"), do: %Builtin{fn: &puts/1}
   def get(_), do: nil
 
   def len([arg] = args) when length(args) == 1 do
@@ -20,6 +22,16 @@ defmodule Monkey.Evaluator.Builtins do
   end
   def len(args),
     do: error("wrong number of arguments. got=#{length(args)}, want=1")
+
+  def puts(args) do
+    Enum.each(args, fn(arg)->
+      arg
+      |> Object.inspect
+      |> IO.puts
+    end)
+
+    %Null{}
+  end
 
   defp error(message), do: %Error{message: message}
 end
