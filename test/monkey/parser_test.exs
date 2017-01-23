@@ -5,6 +5,7 @@ defmodule Monkey.ParserTest do
   alias Monkey.Ast.CallExpression
   alias Monkey.Ast.ExpressionStatement
   alias Monkey.Ast.FunctionLiteral
+  alias Monkey.Ast.HashLiteral
   alias Monkey.Ast.Identifier
   alias Monkey.Ast.IfExpression
   alias Monkey.Ast.IndexExpression
@@ -356,7 +357,7 @@ defmodule Monkey.ParserTest do
   end
 
   test "parse string literal expression" do
-    input = "\"hello world\";"
+    input = ~s{"hello world\";}
 
     {_, program} = parse_input(input)
     assert length(program.statements) == 1
@@ -414,5 +415,126 @@ defmodule Monkey.ParserTest do
     assert %IndexExpression{} = index
     test_identifier(index.left, "myArray")
     test_infix_expression(index.index, 1, "+", 1)
+  end
+
+  test "parse hash literal" do
+    input = ~s/{"one": 1, "two": 2, "three": 3}/
+
+    {_, program} = parse_input(input)
+    assert length(program.statements) == 1
+
+    statement = Enum.at(program.statements, 0)
+    assert %ExpressionStatement{} = statement
+
+    hash = statement.expression
+    assert %HashLiteral{} = hash
+    assert length(Map.keys(hash.pairs)) == 3
+
+    expected = %{
+      "one" => 1,
+      "two" => 2,
+      "three" => 3
+    }
+
+    Enum.each(hash.pairs, fn({key, value})->
+      assert %StringLiteral{} = key
+      expected_value = expected[Node.to_string(key)]
+
+      test_integer_literal(value, expected_value)
+    end)
+  end
+
+  test "parse empty hash literal" do
+    input = "{}"
+
+    {_, program} = parse_input(input)
+    assert length(program.statements) == 1
+
+    statement = Enum.at(program.statements, 0)
+    assert %ExpressionStatement{} = statement
+
+    hash = statement.expression
+    assert %HashLiteral{} = hash
+
+    assert length(Map.keys(hash.pairs)) == 0
+  end
+
+  test "parse hash literal with boolean keys" do
+    input = "{true: 1, false: 2}"
+
+    {_, program} = parse_input(input)
+    assert length(program.statements) == 1
+
+    statement = Enum.at(program.statements, 0)
+    assert %ExpressionStatement{} = statement
+
+    hash = statement.expression
+    assert %HashLiteral{} = hash
+    assert length(Map.keys(hash.pairs)) == 2
+
+    expected = %{
+      "true" => 1,
+      "false" => 2
+    }
+
+    Enum.each(hash.pairs, fn({key, value})->
+      assert %Monkey.Ast.Boolean{} = key
+      expected_value = expected[Node.to_string(key)]
+
+      test_integer_literal(value, expected_value)
+    end)
+  end
+
+  test "parse hash literal with integer keys" do
+    input = "{1: 1, 2: 2, 3: 3}"
+
+    {_, program} = parse_input(input)
+    assert length(program.statements) == 1
+
+    statement = Enum.at(program.statements, 0)
+    assert %ExpressionStatement{} = statement
+
+    hash = statement.expression
+    assert %HashLiteral{} = hash
+    assert length(Map.keys(hash.pairs)) == 3
+
+    expected = %{
+      "1" => 1,
+      "2" => 2,
+      "3" => 3
+    }
+
+    Enum.each(hash.pairs, fn({key, value})->
+      assert %IntegerLiteral{} = key
+      expected_value = expected[Node.to_string(key)]
+
+      test_integer_literal(value, expected_value)
+    end)
+  end
+
+  test "parse hash literal with expressions" do
+    input = ~s({"one": 0 + 1, "two": 10 - 8, "three": 15 / 5})
+
+    {_, program} = parse_input(input)
+    assert length(program.statements) == 1
+
+    statement = Enum.at(program.statements, 0)
+    assert %ExpressionStatement{} = statement
+
+    hash = statement.expression
+    assert %HashLiteral{} = hash
+    assert length(Map.keys(hash.pairs)) == 3
+
+    expected = %{
+      "one" => &(test_infix_expression(&1, 0, "+", 1)),
+      "two" => &(test_infix_expression(&1, 10, "-", 8)),
+      "three" => &(test_infix_expression(&1, 15, "/", 5))
+    }
+
+    Enum.each(hash.pairs, fn({key, value})->
+      assert %StringLiteral{} = key
+      test_fn = expected[Node.to_string(key)]
+      test_fn.(value)
+    end)
   end
 end

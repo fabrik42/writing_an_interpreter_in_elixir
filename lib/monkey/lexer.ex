@@ -60,6 +60,7 @@ defmodule Monkey.Lexer do
     token = case ch do
       "=" -> %Token{type: :assign, literal: ch}
       ";" -> %Token{type: :semicolon, literal: ch}
+      ":" -> %Token{type: :colon, literal: ch}
       "(" -> %Token{type: :lparen, literal: ch}
       ")" -> %Token{type: :rparen, literal: ch}
       "+" -> %Token{type: :plus, literal: ch}

@@ -4,6 +4,7 @@ defmodule Monkey.Evaluator do
   alias Monkey.Ast.CallExpression
   alias Monkey.Ast.ExpressionStatement
   alias Monkey.Ast.FunctionLiteral
+  alias Monkey.Ast.HashLiteral
   alias Monkey.Ast.Identifier
   alias Monkey.Ast.IfExpression
   alias Monkey.Ast.IndexExpression
@@ -21,6 +22,7 @@ defmodule Monkey.Evaluator do
   alias Monkey.Object.Environment
   alias Monkey.Object.Error
   alias Monkey.Object.Function
+  alias Monkey.Object.Hash
   alias Monkey.Object.Integer
   alias Monkey.Object.Null
   alias Monkey.Object.Object
@@ -145,6 +147,9 @@ defmodule Monkey.Evaluator do
         {value, env}
     end
   end
+  def eval(%HashLiteral{} = node, env) do
+    eval_hash_literal(node, env)
+  end
 
   defp eval_program(program, env, evaluated \\ []) do
     do_eval_program(program.statements, env, evaluated)
@@ -266,6 +271,8 @@ defmodule Monkey.Evaluator do
 
   defp eval_index_expression(%Array{} = left, %Integer{} = index),
     do: eval_array_index_expression(left, index)
+  defp eval_index_expression(%Hash{} = left, index),
+    do: eval_hash_index_expression(left, index)
   defp eval_index_expression(left, _),
     do: error("index operator not supported: #{Object.type(left)}")
 
@@ -275,6 +282,48 @@ defmodule Monkey.Evaluator do
     cond do
       idx < 0 -> @cached_null
       true -> Enum.at(array.elements, idx, @cached_null)
+    end
+  end
+
+  defp eval_hash_index_expression(hash, index) do
+    key = Hash.Hashable.hash(index)
+
+    pair = cond do
+      is_error(key) -> error("unusable as hash key: #{Object.type(index)}")
+      true -> Map.get(hash.pairs, key, @cached_null)
+    end
+
+    case pair do
+      %Error{} -> pair
+      @cached_null -> pair
+      _ -> pair.value
+    end
+  end
+
+  defp eval_hash_literal(node, env) do
+    pairs = Map.to_list(node.pairs)
+    eval_hash_pair(pairs, env, %{})
+  end
+
+  defp eval_hash_pair([] = _pairs, env, evaluated_pairs) do
+    hash = %Hash{pairs: evaluated_pairs}
+    {hash, env}
+  end
+  defp eval_hash_pair([pair | rest] = _pairs, env, evaluated_pairs) do
+    {key, value} = pair
+
+    {key, env} = eval(key, env)
+    {value, env} = eval(value, env)
+    hash_key = Hash.Hashable.hash(key)
+
+    cond do
+      is_error(key) -> {key, env}
+      is_error(value) -> {value, env}
+      is_error(hash_key) -> {hash_key, env}
+      true ->
+        hash_pair = %Hash.Pair{key: key, value: value}
+        evaluated_pairs = Map.put(evaluated_pairs, hash_key, hash_pair)
+        eval_hash_pair(rest, env, evaluated_pairs)
     end
   end
 

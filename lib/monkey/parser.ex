@@ -5,6 +5,7 @@ defmodule Monkey.Parser do
   alias Monkey.Ast.CallExpression
   alias Monkey.Ast.ExpressionStatement
   alias Monkey.Ast.FunctionLiteral
+  alias Monkey.Ast.HashLiteral
   alias Monkey.Ast.Identifier
   alias Monkey.Ast.IfExpression
   alias Monkey.Ast.IndexExpression
@@ -151,6 +152,7 @@ defmodule Monkey.Parser do
   defp prefix_parse_fns(:function, p), do: parse_function_literal(p)
   defp prefix_parse_fns(:string, p), do: parse_string_literal(p)
   defp prefix_parse_fns(:lbracket, p), do: parse_array_literal(p)
+  defp prefix_parse_fns(:lbrace, p), do: parse_hash_literal(p)
   defp prefix_parse_fns(_, p) do
     error = "No prefix function found for #{p.curr.type}"
     p = add_error(p, error)
@@ -298,6 +300,40 @@ defmodule Monkey.Parser do
     {p, elements} = parse_expression_list(p, :rbracket)
     array = %ArrayLiteral{token: token, elements: elements}
     {p, array}
+  end
+
+  defp parse_hash_literal(p) do
+    token = p.curr
+    do_parse_hash_literal(p, token, %{})
+  end
+  defp do_parse_hash_literal(%Parser{peek: %Token{type: :rbrace}} = p, token, %{} = pairs) do
+    p = next_token(p)
+    hash = %HashLiteral{token: token, pairs: pairs}
+    {p, hash}
+  end
+  defp do_parse_hash_literal(p, token, pairs) do
+    p = next_token(p)
+
+    with {:ok, p, key} <- parse_expression(p, @precedence_levels.lowest),
+         {:ok, p, _peek} <- expect_peek(p, :colon),
+         p = next_token(p),
+         {:ok, p, value} <- parse_expression(p, @precedence_levels.lowest) do
+      pairs = Map.put(pairs, key, value)
+
+      if p.peek.type == :rbrace do
+        p = next_token(p)
+        hash = %HashLiteral{token: token, pairs: pairs}
+        {p, hash}
+      else
+        # TODO: no nested conditions
+        case expect_peek(p, :comma) do
+          {:ok, p, _peek} -> do_parse_hash_literal(p, token, pairs)
+          {:error, p, _peek} -> {p, nil}
+        end
+      end
+    else
+      {:error, p, _} -> {p, nil}
+    end
   end
 
   defp infix_parse_fns(:plus), do: &(parse_infix_expression(&1, &2))

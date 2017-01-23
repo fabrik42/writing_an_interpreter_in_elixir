@@ -51,6 +51,7 @@ defmodule Monkey.LexerTest do
     "foobar"
     "foo bar"
     [1, 2];
+    {"foo": "bar"}
     """
 
     expected = [
@@ -135,6 +136,11 @@ defmodule Monkey.LexerTest do
       %Token{type: :int, literal: "2"},
       %Token{type: :rbracket, literal: "]"},
       %Token{type: :semicolon, literal: ";"},
+      %Token{type: :lbrace, literal: "{"},
+      %Token{type: :string, literal: "foo"},
+      %Token{type: :colon, literal: ":"},
+      %Token{type: :string, literal: "bar"},
+      %Token{type: :rbrace, literal: "}"},
       %Token{type: :eof, literal: ""}
     ]
 

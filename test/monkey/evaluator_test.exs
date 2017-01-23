@@ -9,6 +9,7 @@ defmodule Monkey.EvaluatorTest do
   alias Monkey.Object.Environment
   alias Monkey.Object.Error
   alias Monkey.Object.Function
+  alias Monkey.Object.Hash
   alias Monkey.Object.Integer
   alias Monkey.Object.Null
   alias Monkey.Object.String
@@ -197,6 +198,10 @@ defmodule Monkey.EvaluatorTest do
       {
         ~s("Hello" - "World"),
         "unknown operator: STRING - STRING"
+      },
+      {
+        ~s/{"name": "Monkey"}[fn(x) { x }];/,
+        "unusable as hash key: FUNCTION"
       }
     ]
 
@@ -335,5 +340,63 @@ defmodule Monkey.EvaluatorTest do
           assert %Null{} = evaluated
       end
     end)
+  end
+
+  test "hash literals" do
+    input = """
+    let two = "two";
+    {
+      "one": 10 - 9,
+      two: 1 + 1,
+      "thr" + "ee": 6 / 2,
+      4: 4,
+      true: 5,
+      false: 6
+    }
+    """
+
+    hash = test_eval(input)
+    assert %Hash{} = hash
+
+    expected = %{
+      Hash.Hashable.hash(%String{value: "one"}) => 1,
+      Hash.Hashable.hash(%String{value: "two"}) => 2,
+      Hash.Hashable.hash(%String{value: "three"}) => 3,
+      Hash.Hashable.hash(%Integer{value: 4}) => 4,
+      Hash.Hashable.hash(%Boolean{value: true}) => 5,
+      Hash.Hashable.hash(%Boolean{value: false}) => 6
+    }
+
+    assert length(Map.keys(expected)) == length(Map.keys(hash.pairs))
+
+    Enum.each(expected, fn({expected_key, expected_value})->
+      pair = hash.pairs[expected_key]
+      assert pair
+      test_integer_object(pair.value, expected_value)
+    end)
+  end
+
+  test "hash index expressions" do
+    values = [
+      {~s/{"foo": 5}["foo"]/, 5},
+      {~s/{"foo": 5}["bar"]/, nil},
+      {~s/let key = "foo"; {"foo": 5}[key]/, 5},
+      {~s/{}["foo"]/, nil},
+      {~s/{5: 5}[5]/, 5},
+      {~s/{true: 5}[true]/, 5},
+      {~s/{false: 5}[false]/, 5}
+    ]
+
+    Enum.each(values, fn({input, expected}) ->
+      evaluated = test_eval(input)
+
+      cond do
+        is_integer(expected) ->
+          test_integer_object(evaluated, expected)
+        true ->
+          assert %Null{} = evaluated
+      end
+    end)
+
   end
 end

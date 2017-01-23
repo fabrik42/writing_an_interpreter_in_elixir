@@ -30,6 +30,7 @@ defmodule Monkey.Token do
            # delimiters
            comma: ",",
            semicolon: ",",
+           colon: ":",
            lparen: "(",
            rparen: ")",
            lbrace: "{",
