@@ -32,7 +32,7 @@ defmodule Monkey.Object.Hash do
 
     def inspect(obj) do
       pairs = obj.pairs
-      |> Enum.map(fn({key, pair}) ->
+      |> Enum.map(fn({_key, pair}) ->
         "#{Object.inspect(pair.key)}:#{Object.inspect(pair.value)}"
       end)
       |> Enum.join(", ")
