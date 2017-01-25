@@ -83,8 +83,8 @@ defmodule Monkey.ParserTest do
   test "parse let statements" do
     values = [
       {"let x = 5;", "x", 5},
-		  {"let y = true;", "y", true},
-		  {"let foobar = y", "foobar", "y"},
+      {"let y = true;", "y", true},
+      {"let foobar = y", "foobar", "y"},
     ]
 
     Enum.each(values, fn({input, identifier, value}) ->
@@ -99,9 +99,9 @@ defmodule Monkey.ParserTest do
 
   test "parse return statements" do
     values = [
-		  {"return 5;", 5},
-		  {"return true;", true},
-		  {"return foobar;", "foobar"}
+      {"return 5;", 5},
+      {"return true;", true},
+      {"return foobar;", "foobar"}
     ]
 
     Enum.each(values, fn({input, value}) ->
@@ -137,9 +137,9 @@ defmodule Monkey.ParserTest do
       {"!5;", "!", 5},
       {"-15", "-", 15},
       {"!foobar;", "!", "foobar"},
-		  {"-foobar;", "-", "foobar"},
-		  {"!true;", "!", true},
-		  {"!false;", "!", false}
+      {"-foobar;", "-", "foobar"},
+      {"!true;", "!", true},
+      {"!false;", "!", false}
     ]
 
     Enum.each(values, fn({input, operator, value}) ->
@@ -164,16 +164,16 @@ defmodule Monkey.ParserTest do
       {"5 == 5;", 5, "==", 5},
       {"5 != 5;", 5, "!=", 5},
       {"foobar + barfoo;", "foobar", "+", "barfoo"},
-		  {"foobar - barfoo;", "foobar", "-", "barfoo"},
-		  {"foobar * barfoo;", "foobar", "*", "barfoo"},
-		  {"foobar / barfoo;", "foobar", "/", "barfoo"},
-		  {"foobar > barfoo;", "foobar", ">", "barfoo"},
-		  {"foobar < barfoo;", "foobar", "<", "barfoo"},
-		  {"foobar == barfoo;", "foobar", "==", "barfoo"},
-		  {"foobar != barfoo;", "foobar", "!=", "barfoo"},
-		  {"true == true", true, "==", true},
-		  {"true != false", true, "!=", false},
-		  {"false == false", false, "==", false}
+      {"foobar - barfoo;", "foobar", "-", "barfoo"},
+      {"foobar * barfoo;", "foobar", "*", "barfoo"},
+      {"foobar / barfoo;", "foobar", "/", "barfoo"},
+      {"foobar > barfoo;", "foobar", ">", "barfoo"},
+      {"foobar < barfoo;", "foobar", "<", "barfoo"},
+      {"foobar == barfoo;", "foobar", "==", "barfoo"},
+      {"foobar != barfoo;", "foobar", "!=", "barfoo"},
+      {"true == true", true, "==", true},
+      {"true != false", true, "!=", false},
+      {"false == false", false, "==", false}
     ]
 
     Enum.each(values, fn({input, left, operator, right}) ->
@@ -188,30 +188,30 @@ defmodule Monkey.ParserTest do
     values = [
       {"-a * b", "((-a) * b)"},
       {"!-a", "(!(-a))"},
-		  {"a + b + c", "((a + b) + c)"},
-		  {"a + b - c", "((a + b) - c)"},
-		  {"a * b * c", "((a * b) * c)"},
-		  {"a * b / c", "((a * b) / c)"},
-		  {"a + b / c", "(a + (b / c))"},
+      {"a + b + c", "((a + b) + c)"},
+      {"a + b - c", "((a + b) - c)"},
+      {"a * b * c", "((a * b) * c)"},
+      {"a * b / c", "((a * b) / c)"},
+      {"a + b / c", "(a + (b / c))"},
       {"a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"},
-		  {"3 + 4; -5 * 5", "(3 + 4)((-5) * 5)"},
-		  {"5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"},
-		  {"5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"},
-		  {"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
-		  {"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
-		  {"true", "true"},
-		  {"false", "false"},
-		  {"3 > 5 == false", "((3 > 5) == false)"},
-		  {"3 < 5 == true", "((3 < 5) == true)"},
-		  {"1 + (2 + 3) + 4", "((1 + (2 + 3)) + 4)"},
-		  {"(5 + 5) * 2", "((5 + 5) * 2)"},
-		  {"2 / (5 + 5)", "(2 / (5 + 5))"},
-		  {"(5 + 5) * 2 * (5 + 5)", "(((5 + 5) * 2) * (5 + 5))"},
-		  {"-(5 + 5)", "(-(5 + 5))"},
-		  {"!(true == true)", "(!(true == true))"},
-		  {"a + add(b * c) + d", "((a + add((b * c))) + d)"},
-		  {"add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"},
-		  {"add(a + b + c * d / f + g)", "add((((a + b) + ((c * d) / f)) + g))"},
+      {"3 + 4; -5 * 5", "(3 + 4)((-5) * 5)"},
+      {"5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"},
+      {"5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"},
+      {"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
+      {"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
+      {"true", "true"},
+      {"false", "false"},
+      {"3 > 5 == false", "((3 > 5) == false)"},
+      {"3 < 5 == true", "((3 < 5) == true)"},
+      {"1 + (2 + 3) + 4", "((1 + (2 + 3)) + 4)"},
+      {"(5 + 5) * 2", "((5 + 5) * 2)"},
+      {"2 / (5 + 5)", "(2 / (5 + 5))"},
+      {"(5 + 5) * 2 * (5 + 5)", "(((5 + 5) * 2) * (5 + 5))"},
+      {"-(5 + 5)", "(-(5 + 5))"},
+      {"!(true == true)", "(!(true == true))"},
+      {"a + add(b * c) + d", "((a + add((b * c))) + d)"},
+      {"add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"},
+      {"add(a + b + c * d / f + g)", "add((((a + b) + ((c * d) / f)) + g))"},
       {"a * [1, 2, 3, 4][b * c] * d", "((a * ([1, 2, 3, 4][(b * c)])) * d)"},
       {"add(a * b[2], b[1], 2 * [1, 2][1])", "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"}
     ]
