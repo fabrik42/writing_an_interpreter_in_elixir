@@ -71,6 +71,15 @@ defmodule Monkey.ParserTest do
     {parser, program}
   end
 
+  def parse_one_expression_statement(input) do
+    {_, program} = parse_input(input)
+    assert length(program.statements) == 1
+
+    statement = Enum.at(program.statements, 0)
+    assert %ExpressionStatement{} = statement
+    statement
+  end
+
   test "parse let statements" do
     values = [
       {"let x = 5;", "x", 5},
@@ -109,11 +118,7 @@ defmodule Monkey.ParserTest do
 
   test "parse identifier expression" do
     input = "foobar;"
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     identifier = statement.expression
     test_identifier(identifier, "foobar")
@@ -121,11 +126,7 @@ defmodule Monkey.ParserTest do
 
   test "parse integer literal expression" do
     input = "5;"
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     literal = statement.expression
     test_integer_literal(literal, 5)
@@ -142,11 +143,7 @@ defmodule Monkey.ParserTest do
     ]
 
     Enum.each(values, fn({input, operator, value}) ->
-      {_, program} = parse_input(input)
-      assert length(program.statements) == 1
-
-      statement = Enum.at(program.statements, 0)
-      assert %ExpressionStatement{} = statement
+      statement = parse_one_expression_statement(input)
 
       expression = statement.expression
       assert %PrefixExpression{} = expression
@@ -180,11 +177,7 @@ defmodule Monkey.ParserTest do
     ]
 
     Enum.each(values, fn({input, left, operator, right}) ->
-      {_, program} = parse_input(input)
-      assert length(program.statements) == 1
-
-      statement = Enum.at(program.statements, 0)
-      assert %ExpressionStatement{} = statement
+      statement = parse_one_expression_statement(input)
 
       expression = statement.expression
       test_infix_expression(expression, left, operator, right)
@@ -236,11 +229,7 @@ defmodule Monkey.ParserTest do
     ]
 
     Enum.each(values, fn({input, value}) ->
-      {_, program} = parse_input(input)
-      assert length(program.statements) == 1
-
-      statement = Enum.at(program.statements, 0)
-      assert %ExpressionStatement{} = statement
+      statement = parse_one_expression_statement(input)
 
       boolean = statement.expression
       assert %BooleanLiteral{} = boolean
@@ -250,11 +239,7 @@ defmodule Monkey.ParserTest do
 
   test "parse if expression" do
     input = "if (x < y) { x }"
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     expression = statement.expression
     assert %IfExpression{} = expression
@@ -269,11 +254,7 @@ defmodule Monkey.ParserTest do
 
   test "parse if/else expression" do
     input = "if (x < y) { x } else { y }"
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     expression = statement.expression
     assert %IfExpression{} = expression
@@ -292,11 +273,7 @@ defmodule Monkey.ParserTest do
 
   test "parse function literal" do
     input = "fn(x, y) { x + y; }"
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     function = statement.expression
     assert %FunctionLiteral{} = function
@@ -318,11 +295,7 @@ defmodule Monkey.ParserTest do
     ]
 
     Enum.each(values, fn({input, parameters}) ->
-      {_, program} = parse_input(input)
-      assert length(program.statements) == 1
-
-      statement = Enum.at(program.statements, 0)
-      assert %ExpressionStatement{} = statement
+      statement = parse_one_expression_statement(input)
 
       function = statement.expression
       assert %FunctionLiteral{} = function
@@ -338,12 +311,7 @@ defmodule Monkey.ParserTest do
 
   test "parse call expression" do
     input = "add(1, 2 * 3, 4 + 5);"
-
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     expression = statement.expression
     assert %CallExpression{} = expression
@@ -358,12 +326,7 @@ defmodule Monkey.ParserTest do
 
   test "parse string literal expression" do
     input = ~s{"hello world\";}
-
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     expression = statement.expression
     assert %StringLiteral{} = expression
@@ -372,12 +335,7 @@ defmodule Monkey.ParserTest do
 
   test "parse empty array literal" do
     input = "[]"
-
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     array = statement.expression
     assert %ArrayLiteral{} = array
@@ -386,12 +344,7 @@ defmodule Monkey.ParserTest do
 
   test "parse array literal" do
     input = "[1, 2 + 2, 3 * 3]"
-
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     array = statement.expression
     assert %ArrayLiteral{} = array
@@ -404,12 +357,7 @@ defmodule Monkey.ParserTest do
 
   test "parse index expression" do
     input = "myArray[1 + 1]"
-
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     index = statement.expression
     assert %IndexExpression{} = index
@@ -419,12 +367,7 @@ defmodule Monkey.ParserTest do
 
   test "parse hash literal" do
     input = ~s/{"one": 1, "two": 2, "three": 3}/
-
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     hash = statement.expression
     assert %HashLiteral{} = hash
@@ -446,12 +389,7 @@ defmodule Monkey.ParserTest do
 
   test "parse empty hash literal" do
     input = "{}"
-
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     hash = statement.expression
     assert %HashLiteral{} = hash
@@ -461,12 +399,7 @@ defmodule Monkey.ParserTest do
 
   test "parse hash literal with boolean keys" do
     input = "{true: 1, false: 2}"
-
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     hash = statement.expression
     assert %HashLiteral{} = hash
@@ -478,7 +411,7 @@ defmodule Monkey.ParserTest do
     }
 
     Enum.each(hash.pairs, fn({key, value})->
-      assert %Monkey.Ast.BooleanLiteral{} = key
+      assert %BooleanLiteral{} = key
       expected_value = expected[Node.to_string(key)]
 
       test_integer_literal(value, expected_value)
@@ -487,12 +420,7 @@ defmodule Monkey.ParserTest do
 
   test "parse hash literal with integer keys" do
     input = "{1: 1, 2: 2, 3: 3}"
-
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     hash = statement.expression
     assert %HashLiteral{} = hash
@@ -514,12 +442,7 @@ defmodule Monkey.ParserTest do
 
   test "parse hash literal with expressions" do
     input = ~s({"one": 0 + 1, "two": 10 - 8, "three": 15 / 5})
-
-    {_, program} = parse_input(input)
-    assert length(program.statements) == 1
-
-    statement = Enum.at(program.statements, 0)
-    assert %ExpressionStatement{} = statement
+    statement = parse_one_expression_statement(input)
 
     hash = statement.expression
     assert %HashLiteral{} = hash
