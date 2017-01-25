@@ -207,17 +207,17 @@ defmodule Monkey.Parser do
     token = p.curr
 
     with {:ok, p, _peek} <- expect_peek(p, :lparen),
-          p = next_token(p),
+          p <- next_token(p),
           {:ok, p, condition} <- parse_expression(p, @precedence_levels.lowest),
           {:ok, p, _peek} <- expect_peek(p, :rparen),
           {:ok, p, _peek} <- expect_peek(p, :lbrace) do
-          {p, consequence} = parse_block_statement(p)
-          {p, alternative} = parse_if_alternative(p)
-          expression = %IfExpression{token: token,
-                                    condition: condition,
-                                    consequence: consequence,
-                                    alternative: alternative}
-        {p, expression}
+      {p, consequence} = parse_block_statement(p)
+      {p, alternative} = parse_if_alternative(p)
+      expression = %IfExpression{token: token,
+                                 condition: condition,
+                                 consequence: consequence,
+                                 alternative: alternative}
+      {p, expression}
     else
       {:error, p, _} -> {p, nil}
     end
@@ -316,7 +316,7 @@ defmodule Monkey.Parser do
 
     with {:ok, p, key} <- parse_expression(p, @precedence_levels.lowest),
          {:ok, p, _peek} <- expect_peek(p, :colon),
-         p = next_token(p),
+         p <- next_token(p),
          {:ok, p, value} <- parse_expression(p, @precedence_levels.lowest) do
       pairs = Map.put(pairs, key, value)
 

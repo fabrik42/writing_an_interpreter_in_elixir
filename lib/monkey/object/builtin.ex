@@ -7,6 +7,6 @@ defmodule Monkey.Object.Builtin do
   defimpl Object, for: __MODULE__ do
     def type(_), do: "BUILTIN"
 
-    def inspect(obj), do: "builtin function"
+    def inspect(_), do: "builtin function"
   end
 end

@@ -6,7 +6,8 @@ defmodule Monkey.Ast.Program do
 
   def token_literal(program) do
     if length(program.statements) > 0 do
-      List.first(program.statements)
+      program.statements
+      |> List.first
       |> Node.token_literal
     else
       ""

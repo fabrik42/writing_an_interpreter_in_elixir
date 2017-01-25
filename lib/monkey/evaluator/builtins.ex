@@ -24,7 +24,7 @@ defmodule Monkey.Evaluator.Builtins do
     do: error("wrong number of arguments. got=#{length(args)}, want=1")
 
   def puts(args) do
-    Enum.each(args, fn(arg)->
+    Enum.each(args, fn(arg) ->
       arg
       |> Object.inspect
       |> IO.puts

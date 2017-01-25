@@ -33,10 +33,10 @@ defmodule Monkey.Evaluator do
   @cached_false %Boolean{value: false}
   @cached_null %Null{}
 
-  def eval(%Program{} = node, env), do: eval_program(node, env)
-  def eval(%ExpressionStatement{} = node, env), do: eval(node.expression, env)
-  def eval(%ReturnStatement{} = node, env) do
-    {value, env} = eval(node.return_value, env)
+  def eval(%Program{} = ast_node, env), do: eval_program(ast_node, env)
+  def eval(%ExpressionStatement{} = ast_node, env), do: eval(ast_node.expression, env)
+  def eval(%ReturnStatement{} = ast_node, env) do
+    {value, env} = eval(ast_node.return_value, env)
     cond do
       is_error(value) -> {value, env}
       true ->
@@ -44,76 +44,76 @@ defmodule Monkey.Evaluator do
         {value, env}
     end
   end
-  def eval(%LetStatement{} = node, env) do
-    {value, env} = eval(node.value, env)
+  def eval(%LetStatement{} = ast_node, env) do
+    {value, env} = eval(ast_node.value, env)
     cond do
       is_error(value) -> {value, env}
       true ->
-        env = Environment.set(env, node.name.value, value)
+        env = Environment.set(env, ast_node.name.value, value)
         {value, env}
     end
   end
-  def eval(%IntegerLiteral{} = node, env) do
-    value = %Integer{value: node.value}
+  def eval(%IntegerLiteral{} = ast_node, env) do
+    value = %Integer{value: ast_node.value}
     {value, env}
   end
-  def eval(%Monkey.Ast.Boolean{} = node, env) do
-    value = from_native_bool(node.value)
+  def eval(%Monkey.Ast.Boolean{} = ast_node, env) do
+    value = from_native_bool(ast_node.value)
     {value, env}
   end
-  def eval(%StringLiteral{} = node, env) do
-    value = %String{value: node.value}
+  def eval(%StringLiteral{} = ast_node, env) do
+    value = %String{value: ast_node.value}
     {value, env}
   end
-  def eval(%PrefixExpression{} = node, env) do
-    {right, env} = eval(node.right, env)
+  def eval(%PrefixExpression{} = ast_node, env) do
+    {right, env} = eval(ast_node.right, env)
     cond do
       is_error(right) -> {right, env}
       true ->
-        value = eval_prefix_expression(node.operator, right)
+        value = eval_prefix_expression(ast_node.operator, right)
         {value, env}
     end
   end
-  def eval(%InfixExpression{} = node, env) do
-    {left, env} = eval(node.left, env)
-    {right, env} = eval(node.right, env)
+  def eval(%InfixExpression{} = ast_node, env) do
+    {left, env} = eval(ast_node.left, env)
+    {right, env} = eval(ast_node.right, env)
 
     cond do
       is_error(left) -> {left, env}
       is_error(right) -> {right, env}
       true ->
-        value = eval_infix_expression(node.operator, left, right)
+        value = eval_infix_expression(ast_node.operator, left, right)
         {value, env}
     end
   end
-  def eval(%BlockStatement{} = node, env) do
-    eval_block_statement(node, env)
+  def eval(%BlockStatement{} = ast_node, env) do
+    eval_block_statement(ast_node, env)
   end
-  def eval(%IfExpression{} = node, env) do
-    eval_if_expression(node, env)
+  def eval(%IfExpression{} = ast_node, env) do
+    eval_if_expression(ast_node, env)
   end
-  def eval(%Identifier{} = node, env) do
-    value = Environment.get(env, node.value)
-    builtin = Builtins.get(node.value)
+  def eval(%Identifier{} = ast_node, env) do
+    value = Environment.get(env, ast_node.value)
+    builtin = Builtins.get(ast_node.value)
     cond do
       value -> {value, env}
       builtin -> {builtin, env}
-      true -> {error("identifier not found: #{node.value}"), env}
+      true -> {error("identifier not found: #{ast_node.value}"), env}
     end
   end
-  def eval(%FunctionLiteral{} = node, env) do
-    params = node.parameters
-    body = node.body
+  def eval(%FunctionLiteral{} = ast_node, env) do
+    params = ast_node.parameters
+    body = ast_node.body
     value = %Function{parameters: params, body: body, environment: env}
     {value, env}
   end
-  def eval(%CallExpression{} = node, env) do
-    {function, env} = eval(node.function, env)
+  def eval(%CallExpression{} = ast_node, env) do
+    {function, env} = eval(ast_node.function, env)
 
     case function do
       %Error{} -> {function, env}
       _ ->
-        {args, env} = eval_expressions(node.arguments, env)
+        {args, env} = eval_expressions(ast_node.arguments, env)
         # TODO: no nested conditions, please
         if length(args) == 1 && is_error(Enum.at(args, 0)) do
           value = Enum.at(args, 0)
@@ -124,8 +124,8 @@ defmodule Monkey.Evaluator do
         end
     end
   end
-  def eval(%ArrayLiteral{} = node, env) do
-    {elements, env} = eval_expressions(node.elements, env)
+  def eval(%ArrayLiteral{} = ast_node, env) do
+    {elements, env} = eval_expressions(ast_node.elements, env)
 
     if length(elements) == 1 && is_error(Enum.at(elements, 0)) do
       value = Enum.at(elements, 0)
@@ -135,9 +135,9 @@ defmodule Monkey.Evaluator do
       {value, env}
     end
   end
-  def eval(%IndexExpression{} = node, env) do
-    {left, env} = eval(node.left, env)
-    {index, env} = eval(node.index, env)
+  def eval(%IndexExpression{} = ast_node, env) do
+    {left, env} = eval(ast_node.left, env)
+    {index, env} = eval(ast_node.index, env)
 
     cond do
       is_error(left) -> {left, env}
@@ -147,8 +147,8 @@ defmodule Monkey.Evaluator do
         {value, env}
     end
   end
-  def eval(%HashLiteral{} = node, env) do
-    eval_hash_literal(node, env)
+  def eval(%HashLiteral{} = ast_node, env) do
+    eval_hash_literal(ast_node, env)
   end
 
   defp eval_program(program, env, evaluated \\ []) do
@@ -300,8 +300,8 @@ defmodule Monkey.Evaluator do
     end
   end
 
-  defp eval_hash_literal(node, env) do
-    pairs = Map.to_list(node.pairs)
+  defp eval_hash_literal(ast_node, env) do
+    pairs = Map.to_list(ast_node.pairs)
     eval_hash_pair(pairs, env, %{})
   end
 
@@ -340,7 +340,7 @@ defmodule Monkey.Evaluator do
     env = Environment.build_enclosed(function.environment)
     pairs = Enum.zip(function.parameters, args)
 
-    List.foldl(pairs, env, fn({identifier, arg}, env)->
+    List.foldl(pairs, env, fn({identifier, arg}, env) ->
       Environment.set(env, identifier.value, arg)
     end)
   end
