@@ -1,5 +1,9 @@
 # Writing An Interpreter In Elixir
 
+[![Build Status](https://travis-ci.org/fabrik42/writing_an_interpreter_in_elixir.svg?branch=master)](https://travis-ci.org/fabrik42/writing_an_interpreter_in_elixir)
+
+---
+
 An interpreter for the Monkey programming language as known from the book [Writing An Interpreter In Go](https://interpreterbook.com/), but this time implemented in Elixir, using only the stdlib.
 
 ## Starting the REPL
