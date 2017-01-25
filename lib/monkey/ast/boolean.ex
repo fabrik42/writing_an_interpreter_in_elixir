@@ -1,4 +1,4 @@
-defmodule Monkey.Ast.Boolean do
+defmodule Monkey.Ast.BooleanLiteral do
   alias Monkey.Ast.Node
 
   @enforce_keys [:token, :value]

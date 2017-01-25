@@ -1,7 +1,7 @@
 defmodule Monkey.ParserTest do
   use ExUnit.Case
   alias Monkey.Ast.ArrayLiteral
-  alias Monkey.Ast.Boolean
+  alias Monkey.Ast.BooleanLiteral
   alias Monkey.Ast.CallExpression
   alias Monkey.Ast.ExpressionStatement
   alias Monkey.Ast.FunctionLiteral
@@ -48,7 +48,7 @@ defmodule Monkey.ParserTest do
   end
 
   def test_boolean_literal(expression, value) do
-    assert %Boolean{} = expression
+    assert %BooleanLiteral{} = expression
     assert expression.value == value
     assert Node.token_literal(expression) == Atom.to_string(value)
   end
@@ -243,7 +243,7 @@ defmodule Monkey.ParserTest do
       assert %ExpressionStatement{} = statement
 
       boolean = statement.expression
-      assert %Boolean{} = boolean
+      assert %BooleanLiteral{} = boolean
       assert boolean.value == value
     end)
   end
@@ -478,7 +478,7 @@ defmodule Monkey.ParserTest do
     }
 
     Enum.each(hash.pairs, fn({key, value})->
-      assert %Monkey.Ast.Boolean{} = key
+      assert %Monkey.Ast.BooleanLiteral{} = key
       expected_value = expected[Node.to_string(key)]
 
       test_integer_literal(value, expected_value)

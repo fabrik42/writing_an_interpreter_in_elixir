@@ -1,7 +1,7 @@
 defmodule Monkey.Parser do
   alias Monkey.Ast.ArrayLiteral
   alias Monkey.Ast.BlockStatement
-  alias Monkey.Ast.Boolean
+  alias Monkey.Ast.BooleanLiteral
   alias Monkey.Ast.CallExpression
   alias Monkey.Ast.ExpressionStatement
   alias Monkey.Ast.FunctionLiteral
@@ -189,7 +189,7 @@ defmodule Monkey.Parser do
   end
 
   defp parse_boolean(p) do
-    boolean = %Boolean{token: p.curr, value: p.curr.type == :true}
+    boolean = %BooleanLiteral{token: p.curr, value: p.curr.type == :true}
     {p, boolean}
   end
 

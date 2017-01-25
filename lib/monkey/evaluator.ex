@@ -1,6 +1,7 @@
 defmodule Monkey.Evaluator do
   alias Monkey.Ast.ArrayLiteral
   alias Monkey.Ast.BlockStatement
+  alias Monkey.Ast.BooleanLiteral
   alias Monkey.Ast.CallExpression
   alias Monkey.Ast.ExpressionStatement
   alias Monkey.Ast.FunctionLiteral
@@ -57,7 +58,7 @@ defmodule Monkey.Evaluator do
     value = %Integer{value: ast_node.value}
     {value, env}
   end
-  def eval(%Monkey.Ast.Boolean{} = ast_node, env) do
+  def eval(%BooleanLiteral{} = ast_node, env) do
     value = from_native_bool(ast_node.value)
     {value, env}
   end
