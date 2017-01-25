@@ -64,7 +64,7 @@ mix test
 
 ### Evaluator
 
-* As the evaluator is stateless, it will not only output the evaluated result, but also the environment that was used to evaluate the code (defined variables).
+* As structs are immutable, the evaluator will not only output the evaluated result, but also the environment that was used to evaluate the code (defined variables).
 * As a consequence, the evaluator will also be called with an environment to work with, so it can resume working in the same environment (see REPL).
 
 ## TODOs
