@@ -152,30 +152,30 @@ defmodule Monkey.Evaluator do
     eval_hash_literal(ast_node, env)
   end
 
-  defp eval_program(program, env, evaluated \\ []) do
-    do_eval_program(program.statements, env, evaluated)
+  defp eval_program(program, env, last_evaluated \\ nil) do
+    do_eval_program(program.statements, env, last_evaluated)
   end
-  defp do_eval_program([], env, evaluated), do: {Enum.at(evaluated, -1), env}
-  defp do_eval_program([statement | rest], env, evaluated) do
+  defp do_eval_program([], env, last_evaluated), do: {last_evaluated, env}
+  defp do_eval_program([statement | rest], env, _evaluated) do
     {value, env} = eval(statement, env)
     case value do
       %ReturnValue{} -> {value.value, env}
       %Error{} -> {value, env}
-      _ -> do_eval_program(rest, env, evaluated ++ [value])
+      _ -> do_eval_program(rest, env, value)
     end
   end
 
-  defp eval_block_statement(block, env, evaluated \\ []) do
-    do_eval_block_statement(block.statements, env, evaluated)
+  defp eval_block_statement(block, env, last_evaluated \\ nil) do
+    do_eval_block_statement(block.statements, env, last_evaluated)
   end
-  defp do_eval_block_statement([], env, evaluated), do: {Enum.at(evaluated, -1), env}
-  defp do_eval_block_statement([statement | rest], env, evaluated) do
+  defp do_eval_block_statement([], env, last_evaluated), do: {last_evaluated, env}
+  defp do_eval_block_statement([statement | rest], env, _last_evaluated) do
     {value, env} = eval(statement, env)
 
     case value do
       %ReturnValue{} -> {value, env}
       %Error{} -> {value, env}
-      _ -> do_eval_block_statement(rest, env, evaluated ++ [value])
+      _ -> do_eval_block_statement(rest, env, value)
     end
   end
 
