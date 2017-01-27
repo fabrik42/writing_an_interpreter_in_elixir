@@ -179,18 +179,17 @@ defmodule Monkey.Evaluator do
     end
   end
 
-  defp eval_expressions(expressions, env, evaluated \\ []) do
-    do_eval_expressions(expressions, env, evaluated)
-  end
-  defp do_eval_expressions([], env, evaluated) do
+  defp eval_expressions(expressions, env) do
+    {evaluated, env} = Enum.reduce_while(expressions, {[], env}, fn(expression, {acc, env}) ->
+      {value, env} = eval(expression, env)
+      case value do
+        %Error{} -> {:halt, {value, env}}
+        _ -> {:cont, {[value | acc], env}}
+      end
+    end)
+
+    evaluated = Enum.reverse(evaluated)
     {evaluated, env}
-  end
-  defp do_eval_expressions([expression | rest], env, evaluated) do
-    {value, env} = eval(expression, env)
-    case value do
-      %Error{} -> {value, env}
-      _ -> do_eval_expressions(rest, env, evaluated ++ [value])
-    end
   end
 
   defp eval_prefix_expression(operator, right) do
