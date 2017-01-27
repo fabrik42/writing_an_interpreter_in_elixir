@@ -7,7 +7,7 @@ defmodule Monkey.Lexer do
   end
 
   defp tokenize(_chars = [], tokens) do
-    tokens ++ [%Token{type: :eof, literal: ""}]
+    Enum.reverse([%Token{type: :eof, literal: ""} | tokens])
   end
 
   defp tokenize(chars = [ch | rest], tokens) do
@@ -26,7 +26,7 @@ defmodule Monkey.Lexer do
     identifier = Enum.join(identifier)
     token = %Token{type: Token.lookup_ident(identifier), literal: identifier}
 
-    tokenize(rest, tokens ++ [token])
+    tokenize(rest, [token | tokens])
   end
 
   defp read_number(chars, tokens) do
@@ -34,7 +34,7 @@ defmodule Monkey.Lexer do
     number = Enum.join(number)
     token = %Token{type: :int, literal: number}
 
-    tokenize(rest, tokens ++ [token])
+    tokenize(rest, [token | tokens])
   end
 
   defp read_two_char_operator(chars, tokens) do
@@ -45,7 +45,7 @@ defmodule Monkey.Lexer do
       "!=" -> %Token{type: :not_eq, literal: literal}
     end
 
-    tokenize(rest, tokens ++ [token])
+    tokenize(rest, [token | tokens])
   end
 
   def read_string([_quote | rest], tokens) do
@@ -53,7 +53,7 @@ defmodule Monkey.Lexer do
     string = Enum.join(string)
     token = %Token{type: :string, literal: string}
 
-    tokenize(rest, tokens ++ [token])
+    tokenize(rest, [token | tokens])
   end
 
   defp read_next_char(_chars = [ch | rest], tokens) do
@@ -78,7 +78,7 @@ defmodule Monkey.Lexer do
       _ -> %Token{type: :illegal, literal: ""}
     end
 
-    tokenize(rest, tokens ++ [token])
+    tokenize(rest, [token | tokens])
   end
 
   defp is_letter(ch) do
