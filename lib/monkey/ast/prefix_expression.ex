@@ -13,14 +13,9 @@ defmodule Monkey.Ast.PrefixExpression do
     def node_type(_), do: :expression
 
     def to_string(expression) do
-      out = [
-        "(",
-        expression.operator,
-        Node.to_string(expression.right),
-        ")"
-      ]
-
-      Enum.join(out)
+      operator = expression.operator
+      right = Node.to_string(expression.right)
+      "(#{operator}#{right})"
     end
   end
 end

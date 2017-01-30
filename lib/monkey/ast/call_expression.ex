@@ -13,18 +13,12 @@ defmodule Monkey.Ast.CallExpression do
     def node_type(_), do: :expression
 
     def to_string(expression) do
+      function = Node.to_string(expression.function)
       arguments = expression.arguments
       |> Enum.map(&Node.to_string/1)
       |> Enum.join(", ")
 
-      out = [
-        Node.to_string(expression.function),
-        "(",
-        arguments,
-        ")"
-      ]
-
-      Enum.join(out)
+      "#{function}(#{arguments})"
     end
   end
 end

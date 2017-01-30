@@ -12,13 +12,7 @@ defmodule Monkey.Object.Array do
       |> Enum.map(&Object.inspect/1)
       |> Enum.join(", ")
 
-      out = [
-        "[",
-        elements,
-        "]"
-      ]
-
-      Enum.join(out)
+      "[#{elements}]"
     end
   end
 end

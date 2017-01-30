@@ -14,17 +14,10 @@ defmodule Monkey.Ast.InfixExpression do
     def node_type(_), do: :expression
 
     def to_string(expression) do
-      out = [
-        "(",
-        Node.to_string(expression.left),
-        " ",
-        expression.operator,
-        " ",
-        Node.to_string(expression.right),
-        ")"
-      ]
-
-      Enum.join(out)
+      left = Node.to_string(expression.left)
+      operator = expression.operator
+      right = Node.to_string(expression.right)
+      "(#{left} #{operator} #{right})"
     end
   end
 end

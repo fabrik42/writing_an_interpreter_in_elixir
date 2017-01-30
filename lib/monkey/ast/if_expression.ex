@@ -14,23 +14,16 @@ defmodule Monkey.Ast.IfExpression do
     def node_type(_), do: :expression
 
     def to_string(expression) do
-      out = [
-        "if",
-        Node.to_string(expression.condition),
-        " ",
-        Node.to_string(expression.consequence)
-      ]
+      condition = Node.to_string(expression.condition)
+      consequence = Node.to_string(expression.consequence)
+      alternative = alternative_to_string(expression.alternative)
+      "if#{condition} #{consequence}#{alternative}"
+    end
 
-      out = if expression.alternative do
-        out ++ [
-          "else ",
-          Node.to_string(expression.alternative)
-        ]
-      else
-        out
-      end
-
-      Enum.join(out)
+    defp alternative_to_string(nil), do: ""
+    defp alternative_to_string(alternative) do
+      string = Node.to_string(alternative)
+      "else #{string}"
     end
   end
 end

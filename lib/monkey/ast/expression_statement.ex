@@ -9,13 +9,8 @@ defmodule Monkey.Ast.ExpressionStatement do
 
     def node_type(_), do: :statement
 
-    def to_string(statement) do
-      if statement.expression do
-        Node.to_string(statement.expression)
-      else
-        ""
-      end
-    end
+    def to_string(%{expression: nil}), do: ""
+    def to_string(statement), do: Node.to_string(statement.expression)
   end
 end
 

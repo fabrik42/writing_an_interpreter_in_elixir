@@ -13,15 +13,9 @@ defmodule Monkey.Ast.IndexExpression do
     def node_type(_), do: :expression
 
     def to_string(expression) do
-      out = [
-        "(",
-        Node.to_string(expression.left),
-        "[",
-        Node.to_string(expression.index),
-        "])"
-      ]
-
-      Enum.join(out)
+      left = Node.to_string(expression.left)
+      index = Node.to_string(expression.index)
+      "(#{left}[#{index}])"
     end
   end
 end

@@ -16,13 +16,7 @@ defmodule Monkey.Ast.ArrayLiteral do
       |> Enum.map(&Node.to_string/1)
       |> Enum.join(", ")
 
-      out = [
-        "[",
-        elements,
-        "]"
-      ]
-
-      Enum.join(out)
+      "[#{elements}]"
     end
   end
 end

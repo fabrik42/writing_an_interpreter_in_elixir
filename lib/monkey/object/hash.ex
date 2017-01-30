@@ -37,13 +37,7 @@ defmodule Monkey.Object.Hash do
       end)
       |> Enum.join(", ")
 
-      out = [
-        "{",
-        pairs,
-        "}"
-      ]
-
-      Enum.join(out)
+      "{#{pairs}}"
     end
   end
 end

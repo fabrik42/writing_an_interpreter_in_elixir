@@ -15,15 +15,8 @@ defmodule Monkey.Object.Function do
       |> Enum.map(&Node.to_string/1)
       |> Enum.join(", ")
 
-      out = [
-        "fn",
-        "(",
-        params,
-        ")",
-        Node.to_string(obj.body)
-      ]
-
-      Enum.join(out)
+      body = Node.to_string(obj.body)
+      "fn(#{params}) {#{body}}"
     end
   end
 end

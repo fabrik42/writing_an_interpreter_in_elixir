@@ -13,19 +13,13 @@ defmodule Monkey.Ast.FunctionLiteral do
     def node_type(_), do: :expression
 
     def to_string(expression) do
+      literal = Node.token_literal(expression)
+      body = Node.to_string(expression.body)
       params = expression.parameters
       |> Enum.map(&Node.to_string/1)
       |> Enum.join(", ")
 
-      out = [
-        Node.token_literal(expression),
-        "(",
-        params,
-        ")",
-        Node.to_string(expression.body)
-      ]
-
-      Enum.join(out)
+      "#{literal}(#{params})#{body}"
     end
   end
 end

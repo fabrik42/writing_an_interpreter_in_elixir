@@ -9,17 +9,13 @@ defmodule Monkey.Ast.ReturnStatement do
 
     def node_type(_), do: :statement
 
+    def to_string(%{return_value: nil} = statement) do
+      Node.token_literal(statement)
+    end
     def to_string(statement) do
-      out = [
-        Node.token_literal(statement),
-        " "
-      ]
-
-      out = if statement.value,
-        do: out ++ [Node.to_string(statement.value)],
-        else: out
-
-      Enum.join(out)
+      literal = Node.token_literal(statement)
+      value = Node.to_string(statement.return_value)
+      "#{literal} #{value}"
     end
   end
 end
