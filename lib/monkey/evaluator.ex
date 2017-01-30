@@ -115,7 +115,6 @@ defmodule Monkey.Evaluator do
       %Error{} -> {function, env}
       _ ->
         {args, env} = eval_expressions(ast_node.arguments, env)
-        # TODO: no nested conditions, please
         if length(args) == 1 && is_error(Enum.at(args, 0)) do
           value = Enum.at(args, 0)
           {value, env}
