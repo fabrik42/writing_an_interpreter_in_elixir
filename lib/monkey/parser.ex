@@ -53,6 +53,7 @@ defmodule Monkey.Parser do
 
   def parse_program(p, statements \\ []), do: do_parse_program(p, statements)
   defp do_parse_program(%Parser{curr: %Token{type: :eof}} = p, statements) do
+    statements = Enum.reverse(statements)
     program = %Program{statements: statements}
     {p, program}
   end
@@ -60,7 +61,7 @@ defmodule Monkey.Parser do
     {p, statement} = parse_statement(p)
     statements = case statement do
       nil -> statements
-      statement -> statements ++ [statement]
+      statement -> [statement | statements]
     end
 
     p = next_token(p)
@@ -276,6 +277,7 @@ defmodule Monkey.Parser do
     do_parse_block_statement(p, token, statements)
   end
   defp do_parse_block_statement(%Parser{curr: %Token{type: :rbrace}} = p, token, statements) do
+    statements = Enum.reverse(statements)
     block = %BlockStatement{token: token, statements: statements}
     {p, block}
   end
@@ -283,7 +285,7 @@ defmodule Monkey.Parser do
     {p, statement} = parse_statement(p)
     statements = case statement do
       nil -> statements
-      statement -> statements ++ [statement]
+      statement -> [statement | statements]
     end
 
     p = next_token(p)
