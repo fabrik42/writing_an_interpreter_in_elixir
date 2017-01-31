@@ -47,6 +47,11 @@ defmodule Monkey.Token do
            return: "RETURN"
   }
 
+  @type t :: %__MODULE__{
+    type: :illegal | :ident,
+    literal: any
+  }
+
   def lookup_ident(ident) do
     Map.get(@keywords, ident, :ident)
   end

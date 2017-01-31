@@ -6,6 +6,7 @@ defmodule Monkey.Lexer do
     tokenize(chars, [])
   end
 
+  @spec tokenize(any, any) :: [Token.t]
   defp tokenize(_chars = [], tokens) do
     Enum.reverse([%Token{type: :eof, literal: ""} | tokens])
   end
