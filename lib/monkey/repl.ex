@@ -1,8 +1,7 @@
 defmodule Monkey.Repl do
   alias Monkey.Evaluator
   alias Monkey.Lexer
-  alias Monkey.Object.Environment
-  alias Monkey.Object.Object
+  alias Monkey.Object.{Environment, Object}
   alias Monkey.Parser
 
   @prompt ">> "

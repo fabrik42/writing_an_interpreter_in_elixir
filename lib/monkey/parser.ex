@@ -1,21 +1,23 @@
 defmodule Monkey.Parser do
-  alias Monkey.Ast.ArrayLiteral
-  alias Monkey.Ast.BlockStatement
-  alias Monkey.Ast.BooleanLiteral
-  alias Monkey.Ast.CallExpression
-  alias Monkey.Ast.ExpressionStatement
-  alias Monkey.Ast.FunctionLiteral
-  alias Monkey.Ast.HashLiteral
-  alias Monkey.Ast.Identifier
-  alias Monkey.Ast.IfExpression
-  alias Monkey.Ast.IndexExpression
-  alias Monkey.Ast.InfixExpression
-  alias Monkey.Ast.IntegerLiteral
-  alias Monkey.Ast.LetStatement
-  alias Monkey.Ast.PrefixExpression
-  alias Monkey.Ast.Program
-  alias Monkey.Ast.ReturnStatement
-  alias Monkey.Ast.StringLiteral
+  alias Monkey.Ast.{
+    ArrayLiteral,
+    BlockStatement,
+    BooleanLiteral,
+    CallExpression,
+    ExpressionStatement,
+    FunctionLiteral,
+    HashLiteral,
+    Identifier,
+    IfExpression,
+    IndexExpression,
+    InfixExpression,
+    IntegerLiteral,
+    LetStatement,
+    PrefixExpression,
+    Program,
+    ReturnStatement,
+    StringLiteral
+  }
   alias Monkey.Parser
   alias Monkey.Token
 

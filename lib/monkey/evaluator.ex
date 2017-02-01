@@ -1,34 +1,38 @@
 defmodule Monkey.Evaluator do
-  alias Monkey.Ast.ArrayLiteral
-  alias Monkey.Ast.BlockStatement
-  alias Monkey.Ast.BooleanLiteral
-  alias Monkey.Ast.CallExpression
-  alias Monkey.Ast.ExpressionStatement
-  alias Monkey.Ast.FunctionLiteral
-  alias Monkey.Ast.HashLiteral
-  alias Monkey.Ast.Identifier
-  alias Monkey.Ast.IfExpression
-  alias Monkey.Ast.IndexExpression
-  alias Monkey.Ast.InfixExpression
-  alias Monkey.Ast.IntegerLiteral
-  alias Monkey.Ast.LetStatement
-  alias Monkey.Ast.PrefixExpression
-  alias Monkey.Ast.Program
-  alias Monkey.Ast.ReturnStatement
-  alias Monkey.Ast.StringLiteral
+  alias Monkey.Ast.{
+    ArrayLiteral,
+    BlockStatement,
+    BooleanLiteral,
+    CallExpression,
+    ExpressionStatement,
+    FunctionLiteral,
+    HashLiteral,
+    Identifier,
+    IfExpression,
+    IndexExpression,
+    InfixExpression,
+    IntegerLiteral,
+    LetStatement,
+    PrefixExpression,
+    Program,
+    ReturnStatement,
+    StringLiteral
+  }
   alias Monkey.Evaluator.Builtins
-  alias Monkey.Object.Array
-  alias Monkey.Object.Boolean
-  alias Monkey.Object.Builtin
-  alias Monkey.Object.Environment
-  alias Monkey.Object.Error
-  alias Monkey.Object.Function
-  alias Monkey.Object.Hash
-  alias Monkey.Object.Integer
-  alias Monkey.Object.Null
-  alias Monkey.Object.Object
-  alias Monkey.Object.ReturnValue
-  alias Monkey.Object.String
+  alias Monkey.Object.{
+    Array,
+    Boolean,
+    Builtin,
+    Environment,
+    Error,
+    Function,
+    Hash,
+    Integer,
+    Null,
+    Object,
+    ReturnValue,
+    String
+  }
 
   @cached_true %Boolean{value: true}
   @cached_false %Boolean{value: false}

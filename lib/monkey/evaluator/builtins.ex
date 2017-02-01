@@ -1,8 +1,10 @@
 defmodule Monkey.Evaluator.Builtins do
-  alias Monkey.Object.Builtin
-  alias Monkey.Object.Error
-  alias Monkey.Object.Null
-  alias Monkey.Object.Object
+  alias Monkey.Object.{
+    Builtin,
+    Error,
+    Null,
+    Object
+  }
 
   def get("len"), do: %Builtin{fn: &len/1}
   def get("puts"), do: %Builtin{fn: &puts/1}
