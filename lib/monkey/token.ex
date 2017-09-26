@@ -46,6 +46,11 @@ defmodule Monkey.Token do
            else: "ELSE",
            return: "RETURN"
   }
+  @type_keys Map.keys(@types)
+
+  def new([type: type, literal: literal]) when type in @type_keys do
+    %__MODULE__{type: type, literal: literal}
+  end
 
   def lookup_ident(ident) do
     Map.get(@keywords, ident, :ident)
