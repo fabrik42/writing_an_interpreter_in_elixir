@@ -46,10 +46,13 @@ defmodule Monkey.Token do
            else: "ELSE",
            return: "RETURN"
   }
-  @type_keys Map.keys(@types)
 
-  def new([type: type, literal: literal]) when type in @type_keys do
-    %__MODULE__{type: type, literal: literal}
+  def new([type: type, literal: literal]) when is_atom(type) and is_binary(literal) do
+    if Map.has_key?(@types, type) do
+      %__MODULE__{type: type, literal: literal}
+    else
+      raise "Token with type #{inspect(type)} is not defined"
+    end
   end
 
   def lookup_ident(ident) do
