@@ -3,6 +3,15 @@ defmodule Monkey.LexerTest do
 
   alias Monkey.Token
 
+  test "converts single literal" do
+    input = "true"
+
+    assert Monkey.Lexer.tokenize(input) == [
+      %Token{type: :true, literal: "true"},
+      %Token{type: :eof, literal: ""}
+    ]
+  end
+
   test "converts a string into a list of tokens" do
     input = "=+(){},;"
 
