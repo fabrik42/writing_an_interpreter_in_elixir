@@ -40,10 +40,12 @@ defmodule Monkey.Lexer do
   defp read_two_char_operator(chars, tokens) do
     {literal, rest} = Enum.split(chars, 2)
     literal = Enum.join(literal)
-    token = case literal do
-      "==" -> Token.new(type: :eq, literal: literal)
-      "!=" -> Token.new(type: :not_eq, literal: literal)
-    end
+
+    token =
+      case literal do
+        "==" -> Token.new(type: :eq, literal: literal)
+        "!=" -> Token.new(type: :not_eq, literal: literal)
+      end
 
     tokenize(rest, [token | tokens])
   end
@@ -57,32 +59,33 @@ defmodule Monkey.Lexer do
   end
 
   defp read_next_char(_chars = [ch | rest], tokens) do
-    token = case ch do
-      "=" -> Token.new(type: :assign, literal: ch)
-      ";" -> Token.new(type: :semicolon, literal: ch)
-      ":" -> Token.new(type: :colon, literal: ch)
-      "(" -> Token.new(type: :lparen, literal: ch)
-      ")" -> Token.new(type: :rparen, literal: ch)
-      "+" -> Token.new(type: :plus, literal: ch)
-      "-" -> Token.new(type: :minus, literal: ch)
-      "!" -> Token.new(type: :bang, literal: ch)
-      "*" -> Token.new(type: :asterisk, literal: ch)
-      "/" -> Token.new(type: :slash, literal: ch)
-      "<" -> Token.new(type: :lt, literal: ch)
-      ">" -> Token.new(type: :gt, literal: ch)
-      "," -> Token.new(type: :comma, literal: ch)
-      "{" -> Token.new(type: :lbrace, literal: ch)
-      "}" -> Token.new(type: :rbrace, literal: ch)
-      "[" -> Token.new(type: :lbracket, literal: ch)
-      "]" -> Token.new(type: :rbracket, literal: ch)
-      _ -> Token.new(type: :illegal, literal: "")
-    end
+    token =
+      case ch do
+        "=" -> Token.new(type: :assign, literal: ch)
+        ";" -> Token.new(type: :semicolon, literal: ch)
+        ":" -> Token.new(type: :colon, literal: ch)
+        "(" -> Token.new(type: :lparen, literal: ch)
+        ")" -> Token.new(type: :rparen, literal: ch)
+        "+" -> Token.new(type: :plus, literal: ch)
+        "-" -> Token.new(type: :minus, literal: ch)
+        "!" -> Token.new(type: :bang, literal: ch)
+        "*" -> Token.new(type: :asterisk, literal: ch)
+        "/" -> Token.new(type: :slash, literal: ch)
+        "<" -> Token.new(type: :lt, literal: ch)
+        ">" -> Token.new(type: :gt, literal: ch)
+        "," -> Token.new(type: :comma, literal: ch)
+        "{" -> Token.new(type: :lbrace, literal: ch)
+        "}" -> Token.new(type: :rbrace, literal: ch)
+        "[" -> Token.new(type: :lbracket, literal: ch)
+        "]" -> Token.new(type: :rbracket, literal: ch)
+        _ -> Token.new(type: :illegal, literal: "")
+      end
 
     tokenize(rest, [token | tokens])
   end
 
   defp is_letter(ch) do
-    "a" <= ch && ch <= "z" || "A" <= ch && ch <= "Z" || ch == "_"
+    ("a" <= ch && ch <= "z") || ("A" <= ch && ch <= "Z") || ch == "_"
   end
 
   defp is_digit(ch) do

@@ -2,10 +2,13 @@ defmodule Monkey.Ast.PrefixExpression do
   alias Monkey.Ast.Node
 
   @enforce_keys [:token, :operator, :right]
-  defstruct [:token, # the prefix token
-             :operator,
-             :right  # expression
-            ]
+  defstruct [
+    # the prefix token
+    :token,
+    :operator,
+    # expression
+    :right
+  ]
 
   defimpl Node, for: __MODULE__ do
     def token_literal(expression), do: expression.token.literal

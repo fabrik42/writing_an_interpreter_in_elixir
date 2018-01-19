@@ -8,9 +8,10 @@ defmodule Monkey.Object.Array do
     def type(_), do: "ARRAY"
 
     def inspect(obj) do
-      elements = obj.elements
-      |> Enum.map(&Object.inspect/1)
-      |> Enum.join(", ")
+      elements =
+        obj.elements
+        |> Enum.map(&Object.inspect/1)
+        |> Enum.join(", ")
 
       "[#{elements}]"
     end

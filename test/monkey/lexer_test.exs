@@ -20,11 +20,10 @@ defmodule Monkey.LexerTest do
 
     tokens = Monkey.Lexer.tokenize(input)
 
-
     assert length(tokens) == length(expected)
 
     Enum.zip(expected, tokens)
-    |> Enum.each(&(assert elem(&1, 0) == elem(&1, 1)))
+    |> Enum.each(&assert elem(&1, 0) == elem(&1, 1))
   end
 
   test "converts real monkey code into a list of tokens" do
@@ -111,13 +110,13 @@ defmodule Monkey.LexerTest do
       %Token{type: :rparen, literal: ")"},
       %Token{type: :lbrace, literal: "{"},
       %Token{type: :return, literal: "return"},
-      %Token{type: :true, literal: "true"},
+      %Token{type: true, literal: "true"},
       %Token{type: :semicolon, literal: ";"},
       %Token{type: :rbrace, literal: "}"},
       %Token{type: :else, literal: "else"},
       %Token{type: :lbrace, literal: "{"},
       %Token{type: :return, literal: "return"},
-      %Token{type: :false, literal: "false"},
+      %Token{type: false, literal: "false"},
       %Token{type: :semicolon, literal: ";"},
       %Token{type: :rbrace, literal: "}"},
       %Token{type: :int, literal: "10"},
@@ -149,6 +148,6 @@ defmodule Monkey.LexerTest do
     assert length(tokens) == length(expected)
 
     Enum.zip(expected, tokens)
-    |> Enum.each(&(assert elem(&1, 0) == elem(&1, 1)))
+    |> Enum.each(&assert elem(&1, 0) == elem(&1, 1))
   end
 end

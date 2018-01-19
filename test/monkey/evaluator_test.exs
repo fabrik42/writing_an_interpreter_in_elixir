@@ -19,7 +19,7 @@ defmodule Monkey.EvaluatorTest do
     tokens = Lexer.tokenize(input)
     parser = Parser.from_tokens(tokens)
     {parser, program} = Parser.parse_program(parser)
-    env = Environment.build
+    env = Environment.build()
 
     assert length(parser.errors) == 0
     {result, _env} = Evaluator.eval(program, env)
@@ -59,7 +59,7 @@ defmodule Monkey.EvaluatorTest do
       {"(5 + 10 * 2 + 15 / 3) * 2 + -10", 50}
     ]
 
-    Enum.each(values, fn({input, expected}) ->
+    Enum.each(values, fn {input, expected} ->
       evaluated = test_eval(input)
       test_integer_object(evaluated, expected)
     end)
@@ -80,7 +80,7 @@ defmodule Monkey.EvaluatorTest do
       {"(1 > 2) == false", true}
     ]
 
-    Enum.each(values, fn({input, expected}) ->
+    Enum.each(values, fn {input, expected} ->
       evaluated = test_eval(input)
       test_boolean_object(evaluated, expected)
     end)
@@ -104,7 +104,7 @@ defmodule Monkey.EvaluatorTest do
       {"1 != 2", true}
     ]
 
-    Enum.each(values, fn({input, expected}) ->
+    Enum.each(values, fn {input, expected} ->
       evaluated = test_eval(input)
       test_boolean_object(evaluated, expected)
     end)
@@ -121,8 +121,9 @@ defmodule Monkey.EvaluatorTest do
       {"if (1 < 2) { 10 } else { 20 }", 10}
     ]
 
-    Enum.each(values, fn({input, expected}) ->
+    Enum.each(values, fn {input, expected} ->
       evaluated = test_eval(input)
+
       if expected do
         test_integer_object(evaluated, expected)
       else
@@ -138,16 +139,16 @@ defmodule Monkey.EvaluatorTest do
       {"return 2 * 5; 9;", 10},
       {"9; return 2 * 5; 9;", 10},
       {"""
-      if (10 > 1) {
-        if (10 > 1) {
-          return 10;
-        }
-        return 1;
-      }
-      """, 10}
+       if (10 > 1) {
+         if (10 > 1) {
+           return 10;
+         }
+         return 1;
+       }
+       """, 10}
     ]
 
-    Enum.each(values, fn({input, expected}) ->
+    Enum.each(values, fn {input, expected} ->
       evaluated = test_eval(input)
       test_integer_object(evaluated, expected)
     end)
@@ -157,27 +158,27 @@ defmodule Monkey.EvaluatorTest do
     values = [
       {
         "5 + true;",
-        "type mismatch: INTEGER + BOOLEAN",
+        "type mismatch: INTEGER + BOOLEAN"
       },
       {
         "5 + true; 5;",
-        "type mismatch: INTEGER + BOOLEAN",
+        "type mismatch: INTEGER + BOOLEAN"
       },
       {
         "-true",
-        "unknown operator: -BOOLEAN",
+        "unknown operator: -BOOLEAN"
       },
       {
         "true + false;",
-        "unknown operator: BOOLEAN + BOOLEAN",
+        "unknown operator: BOOLEAN + BOOLEAN"
       },
       {
         "5; true + false; 5",
-        "unknown operator: BOOLEAN + BOOLEAN",
+        "unknown operator: BOOLEAN + BOOLEAN"
       },
       {
         "if (10 > 1) { true + false; }",
-        "unknown operator: BOOLEAN + BOOLEAN",
+        "unknown operator: BOOLEAN + BOOLEAN"
       },
       {
         """
@@ -193,7 +194,7 @@ defmodule Monkey.EvaluatorTest do
       },
       {
         "foobar",
-        "identifier not found: foobar",
+        "identifier not found: foobar"
       },
       {
         ~s("Hello" - "World"),
@@ -205,7 +206,7 @@ defmodule Monkey.EvaluatorTest do
       }
     ]
 
-    Enum.each(values, fn({input, expected}) ->
+    Enum.each(values, fn {input, expected} ->
       evaluated = test_eval(input)
       assert %Error{} = evaluated
       assert evaluated.message == expected
@@ -220,7 +221,7 @@ defmodule Monkey.EvaluatorTest do
       {"let a = 5; let b = a; let c = a + b + 5; c;", 15}
     ]
 
-    Enum.each(values, fn({input, expected}) ->
+    Enum.each(values, fn {input, expected} ->
       evaluated = test_eval(input)
       test_integer_object(evaluated, expected)
     end)
@@ -246,7 +247,7 @@ defmodule Monkey.EvaluatorTest do
       {"fn(x) { x; }(5)", 5}
     ]
 
-    Enum.each(values, fn({input, expected}) ->
+    Enum.each(values, fn {input, expected} ->
       evaluated = test_eval(input)
       test_integer_object(evaluated, expected)
     end)
@@ -291,12 +292,13 @@ defmodule Monkey.EvaluatorTest do
       {~s/len("one", "two")/, "wrong number of arguments. got=2, want=1"}
     ]
 
-    Enum.each(values, fn({input, expected}) ->
+    Enum.each(values, fn {input, expected} ->
       evaluated = test_eval(input)
 
       cond do
         is_integer(expected) ->
           test_integer_object(evaluated, expected)
+
         is_bitstring(expected) ->
           assert %Error{} = evaluated
           assert evaluated.message == expected
@@ -330,12 +332,13 @@ defmodule Monkey.EvaluatorTest do
       {"[1, 2, 3][-1]", nil}
     ]
 
-    Enum.each(values, fn({input, expected}) ->
+    Enum.each(values, fn {input, expected} ->
       evaluated = test_eval(input)
 
       cond do
         is_integer(expected) ->
           test_integer_object(evaluated, expected)
+
         true ->
           assert %Null{} = evaluated
       end
@@ -369,7 +372,7 @@ defmodule Monkey.EvaluatorTest do
 
     assert length(Map.keys(expected)) == length(Map.keys(hash.pairs))
 
-    Enum.each(expected, fn({expected_key, expected_value})->
+    Enum.each(expected, fn {expected_key, expected_value} ->
       pair = hash.pairs[expected_key]
       assert pair
       test_integer_object(pair.value, expected_value)
@@ -387,16 +390,16 @@ defmodule Monkey.EvaluatorTest do
       {~s/{false: 5}[false]/, 5}
     ]
 
-    Enum.each(values, fn({input, expected}) ->
+    Enum.each(values, fn {input, expected} ->
       evaluated = test_eval(input)
 
       cond do
         is_integer(expected) ->
           test_integer_object(evaluated, expected)
+
         true ->
           assert %Null{} = evaluated
       end
     end)
-
   end
 end

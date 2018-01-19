@@ -2,10 +2,13 @@ defmodule Monkey.Ast.LetStatement do
   alias Monkey.Ast.Node
 
   @enforce_keys [:token, :name, :value]
-  defstruct [:token,
-             :name, # identifier
-             :value # expression
-            ]
+  defstruct [
+    :token,
+    # identifier
+    :name,
+    # expression
+    :value
+  ]
 
   defimpl Node, for: __MODULE__ do
     def token_literal(statement), do: statement.token.literal
@@ -25,4 +28,3 @@ defmodule Monkey.Ast.LetStatement do
     end
   end
 end
-

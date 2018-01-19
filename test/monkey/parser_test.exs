@@ -84,10 +84,10 @@ defmodule Monkey.ParserTest do
     values = [
       {"let x = 5;", "x", 5},
       {"let y = true;", "y", true},
-      {"let foobar = y", "foobar", "y"},
+      {"let foobar = y", "foobar", "y"}
     ]
 
-    Enum.each(values, fn({input, identifier, value}) ->
+    Enum.each(values, fn {input, identifier, value} ->
       {_, program} = parse_input(input)
       assert length(program.statements) == 1
 
@@ -104,7 +104,7 @@ defmodule Monkey.ParserTest do
       {"return foobar;", "foobar"}
     ]
 
-    Enum.each(values, fn({input, value}) ->
+    Enum.each(values, fn {input, value} ->
       {_, program} = parse_input(input)
       assert length(program.statements) == 1
 
@@ -142,7 +142,7 @@ defmodule Monkey.ParserTest do
       {"!false;", "!", false}
     ]
 
-    Enum.each(values, fn({input, operator, value}) ->
+    Enum.each(values, fn {input, operator, value} ->
       statement = parse_one_expression_statement(input)
 
       expression = statement.expression
@@ -176,7 +176,7 @@ defmodule Monkey.ParserTest do
       {"false == false", false, "==", false}
     ]
 
-    Enum.each(values, fn({input, left, operator, right}) ->
+    Enum.each(values, fn {input, left, operator, right} ->
       statement = parse_one_expression_statement(input)
 
       expression = statement.expression
@@ -210,13 +210,14 @@ defmodule Monkey.ParserTest do
       {"-(5 + 5)", "(-(5 + 5))"},
       {"!(true == true)", "(!(true == true))"},
       {"a + add(b * c) + d", "((a + add((b * c))) + d)"},
-      {"add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"},
+      {"add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))",
+       "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"},
       {"add(a + b + c * d / f + g)", "add((((a + b) + ((c * d) / f)) + g))"},
       {"a * [1, 2, 3, 4][b * c] * d", "((a * ([1, 2, 3, 4][(b * c)])) * d)"},
       {"add(a * b[2], b[1], 2 * [1, 2][1])", "add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))"}
     ]
 
-    Enum.each(values, fn({input, expected}) ->
+    Enum.each(values, fn {input, expected} ->
       {_, program} = parse_input(input)
       assert Program.to_string(program) == expected
     end)
@@ -228,7 +229,7 @@ defmodule Monkey.ParserTest do
       {"false", false}
     ]
 
-    Enum.each(values, fn({input, value}) ->
+    Enum.each(values, fn {input, value} ->
       statement = parse_one_expression_statement(input)
 
       boolean = statement.expression
@@ -294,7 +295,7 @@ defmodule Monkey.ParserTest do
       {"fn(x, y, z) {};", ["x", "y", "z"]}
     ]
 
-    Enum.each(values, fn({input, parameters}) ->
+    Enum.each(values, fn {input, parameters} ->
       statement = parse_one_expression_statement(input)
 
       function = statement.expression
@@ -303,7 +304,7 @@ defmodule Monkey.ParserTest do
       assert length(function.parameters) == length(parameters)
 
       Enum.zip(function.parameters, parameters)
-      |> Enum.each(fn({identifier, expected}) ->
+      |> Enum.each(fn {identifier, expected} ->
         test_literal_expression(identifier, expected)
       end)
     end)
@@ -379,7 +380,7 @@ defmodule Monkey.ParserTest do
       "three" => 3
     }
 
-    Enum.each(hash.pairs, fn({key, value})->
+    Enum.each(hash.pairs, fn {key, value} ->
       assert %StringLiteral{} = key
       expected_value = expected[Node.to_string(key)]
 
@@ -410,7 +411,7 @@ defmodule Monkey.ParserTest do
       "false" => 2
     }
 
-    Enum.each(hash.pairs, fn({key, value})->
+    Enum.each(hash.pairs, fn {key, value} ->
       assert %BooleanLiteral{} = key
       expected_value = expected[Node.to_string(key)]
 
@@ -432,7 +433,7 @@ defmodule Monkey.ParserTest do
       "3" => 3
     }
 
-    Enum.each(hash.pairs, fn({key, value})->
+    Enum.each(hash.pairs, fn {key, value} ->
       assert %IntegerLiteral{} = key
       expected_value = expected[Node.to_string(key)]
 
@@ -449,12 +450,12 @@ defmodule Monkey.ParserTest do
     assert length(Map.keys(hash.pairs)) == 3
 
     expected = %{
-      "one" => &(test_infix_expression(&1, 0, "+", 1)),
-      "two" => &(test_infix_expression(&1, 10, "-", 8)),
-      "three" => &(test_infix_expression(&1, 15, "/", 5))
+      "one" => &test_infix_expression(&1, 0, "+", 1),
+      "two" => &test_infix_expression(&1, 10, "-", 8),
+      "three" => &test_infix_expression(&1, 15, "/", 5)
     }
 
-    Enum.each(hash.pairs, fn({key, value})->
+    Enum.each(hash.pairs, fn {key, value} ->
       assert %StringLiteral{} = key
       test_fn = expected[Node.to_string(key)]
       test_fn.(value)

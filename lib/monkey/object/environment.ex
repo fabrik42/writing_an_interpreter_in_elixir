@@ -13,6 +13,7 @@ defmodule Monkey.Object.Environment do
 
   def get(env, name) do
     value = Map.get(env.store, name)
+
     cond do
       is_nil(value) && env.outer -> __MODULE__.get(env.outer, name)
       true -> value

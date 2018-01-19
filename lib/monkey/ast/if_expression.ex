@@ -2,11 +2,15 @@ defmodule Monkey.Ast.IfExpression do
   alias Monkey.Ast.Node
 
   @enforce_keys [:token, :condition, :consequence]
-  defstruct [:token,
-             :condition, # expression
-             :consequence, # block statement
-             :alternative # block statement
-            ]
+  defstruct [
+    :token,
+    # expression
+    :condition,
+    # block statement
+    :consequence,
+    # block statement
+    :alternative
+  ]
 
   defimpl Node, for: __MODULE__ do
     def token_literal(expression), do: expression.token.literal
@@ -21,6 +25,7 @@ defmodule Monkey.Ast.IfExpression do
     end
 
     defp alternative_to_string(nil), do: ""
+
     defp alternative_to_string(alternative) do
       string = Node.to_string(alternative)
       "else #{string}"

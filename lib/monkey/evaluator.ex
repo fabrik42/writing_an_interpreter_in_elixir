@@ -18,7 +18,9 @@ defmodule Monkey.Evaluator do
     ReturnStatement,
     StringLiteral
   }
+
   alias Monkey.Evaluator.Builtins
+
   alias Monkey.Object.{
     Array,
     Boolean,
@@ -40,85 +42,114 @@ defmodule Monkey.Evaluator do
 
   def eval(%Program{} = ast_node, env), do: eval_program(ast_node, env)
   def eval(%ExpressionStatement{} = ast_node, env), do: eval(ast_node.expression, env)
+
   def eval(%ReturnStatement{} = ast_node, env) do
     {value, env} = eval(ast_node.return_value, env)
+
     cond do
-      is_error(value) -> {value, env}
+      is_error(value) ->
+        {value, env}
+
       true ->
         value = %ReturnValue{value: value}
         {value, env}
     end
   end
+
   def eval(%LetStatement{} = ast_node, env) do
     {value, env} = eval(ast_node.value, env)
+
     cond do
-      is_error(value) -> {value, env}
+      is_error(value) ->
+        {value, env}
+
       true ->
         env = Environment.set(env, ast_node.name.value, value)
         {value, env}
     end
   end
+
   def eval(%IntegerLiteral{} = ast_node, env) do
     value = %Integer{value: ast_node.value}
     {value, env}
   end
+
   def eval(%BooleanLiteral{} = ast_node, env) do
     value = from_native_bool(ast_node.value)
     {value, env}
   end
+
   def eval(%StringLiteral{} = ast_node, env) do
     value = %String{value: ast_node.value}
     {value, env}
   end
+
   def eval(%PrefixExpression{} = ast_node, env) do
     {right, env} = eval(ast_node.right, env)
+
     cond do
-      is_error(right) -> {right, env}
+      is_error(right) ->
+        {right, env}
+
       true ->
         value = eval_prefix_expression(ast_node.operator, right)
         {value, env}
     end
   end
+
   def eval(%InfixExpression{} = ast_node, env) do
     {left, env} = eval(ast_node.left, env)
     {right, env} = eval(ast_node.right, env)
 
     cond do
-      is_error(left) -> {left, env}
-      is_error(right) -> {right, env}
+      is_error(left) ->
+        {left, env}
+
+      is_error(right) ->
+        {right, env}
+
       true ->
         value = eval_infix_expression(ast_node.operator, left, right)
         {value, env}
     end
   end
+
   def eval(%BlockStatement{} = ast_node, env) do
     eval_block_statement(ast_node, env)
   end
+
   def eval(%IfExpression{} = ast_node, env) do
     eval_if_expression(ast_node, env)
   end
+
   def eval(%Identifier{} = ast_node, env) do
     value = Environment.get(env, ast_node.value)
     builtin = Builtins.get(ast_node.value)
+
     cond do
       value -> {value, env}
       builtin -> {builtin, env}
       true -> {error("identifier not found: #{ast_node.value}"), env}
     end
   end
+
   def eval(%FunctionLiteral{} = ast_node, env) do
     params = ast_node.parameters
     body = ast_node.body
     value = %Function{parameters: params, body: body, environment: env}
     {value, env}
   end
+
   def eval(%CallExpression{} = ast_node, env) do
     {function, env} = eval(ast_node.function, env)
 
     case function do
-      %Error{} -> {function, env}
+      %Error{} ->
+        {function, env}
+
       _ ->
         {args, env} = eval_expressions(ast_node.arguments, env)
+
         if length(args) == 1 && is_error(Enum.at(args, 0)) do
           value = Enum.at(args, 0)
           {value, env}
@@ -128,6 +159,7 @@ defmodule Monkey.Evaluator do
         end
     end
   end
+
   def eval(%ArrayLiteral{} = ast_node, env) do
     {elements, env} = eval_expressions(ast_node.elements, env)
 
@@ -139,18 +171,24 @@ defmodule Monkey.Evaluator do
       {value, env}
     end
   end
+
   def eval(%IndexExpression{} = ast_node, env) do
     {left, env} = eval(ast_node.left, env)
     {index, env} = eval(ast_node.index, env)
 
     cond do
-      is_error(left) -> {left, env}
-      is_error(index) -> {index, env}
+      is_error(left) ->
+        {left, env}
+
+      is_error(index) ->
+        {index, env}
+
       true ->
         value = eval_index_expression(left, index)
         {value, env}
     end
   end
+
   def eval(%HashLiteral{} = ast_node, env) do
     eval_hash_literal(ast_node, env)
   end
@@ -158,9 +196,12 @@ defmodule Monkey.Evaluator do
   defp eval_program(program, env, last_evaluated \\ nil) do
     do_eval_program(program.statements, env, last_evaluated)
   end
+
   defp do_eval_program([], env, last_evaluated), do: {last_evaluated, env}
+
   defp do_eval_program([statement | rest], env, _evaluated) do
     {value, env} = eval(statement, env)
+
     case value do
       %ReturnValue{} -> {value.value, env}
       %Error{} -> {value, env}
@@ -171,7 +212,9 @@ defmodule Monkey.Evaluator do
   defp eval_block_statement(block, env, last_evaluated \\ nil) do
     do_eval_block_statement(block.statements, env, last_evaluated)
   end
+
   defp do_eval_block_statement([], env, last_evaluated), do: {last_evaluated, env}
+
   defp do_eval_block_statement([statement | rest], env, _last_evaluated) do
     {value, env} = eval(statement, env)
 
@@ -183,13 +226,15 @@ defmodule Monkey.Evaluator do
   end
 
   defp eval_expressions(expressions, env) do
-    {evaluated, env} = Enum.reduce_while(expressions, {[], env}, fn(expression, {acc, env}) ->
-      {value, env} = eval(expression, env)
-      case value do
-        %Error{} -> {:halt, {value, env}}
-        _ -> {:cont, {[value | acc], env}}
-      end
-    end)
+    {evaluated, env} =
+      Enum.reduce_while(expressions, {[], env}, fn expression, {acc, env} ->
+        {value, env} = eval(expression, env)
+
+        case value do
+          %Error{} -> {:halt, {value, env}}
+          _ -> {:cont, {[value | acc], env}}
+        end
+      end)
 
     evaluated = Enum.reverse(evaluated)
     {evaluated, env}
@@ -221,21 +266,23 @@ defmodule Monkey.Evaluator do
 
   defp eval_infix_expression(operator, %Integer{} = left, %Integer{} = right),
     do: eval_integer_infix_expression(operator, left, right)
+
   defp eval_infix_expression(operator, %String{} = left, %String{} = right),
     do: eval_string_infix_expression(operator, left, right)
-  defp eval_infix_expression("==", left, right),
-    do: from_native_bool(left == right)
-  defp eval_infix_expression("!=", left, right),
-    do: from_native_bool(left != right)
+
+  defp eval_infix_expression("==", left, right), do: from_native_bool(left == right)
+  defp eval_infix_expression("!=", left, right), do: from_native_bool(left != right)
+
   defp eval_infix_expression(operator, left, right) do
     left_type = Object.type(left)
     right_type = Object.type(right)
 
-    message = if left_type != right_type do
-      "type mismatch: #{left_type} #{operator} #{right_type}"
-    else
-      "unknown operator: #{left_type} #{operator} #{right_type}"
-    end
+    message =
+      if left_type != right_type do
+        "type mismatch: #{left_type} #{operator} #{right_type}"
+      else
+        "unknown operator: #{left_type} #{operator} #{right_type}"
+      end
 
     error(message)
   end
@@ -274,8 +321,9 @@ defmodule Monkey.Evaluator do
 
   defp eval_index_expression(%Array{} = left, %Integer{} = index),
     do: eval_array_index_expression(left, index)
-  defp eval_index_expression(%Hash{} = left, index),
-    do: eval_hash_index_expression(left, index)
+
+  defp eval_index_expression(%Hash{} = left, index), do: eval_hash_index_expression(left, index)
+
   defp eval_index_expression(left, _),
     do: error("index operator not supported: #{Object.type(left)}")
 
@@ -291,10 +339,11 @@ defmodule Monkey.Evaluator do
   defp eval_hash_index_expression(hash, index) do
     key = Hash.Hashable.hash(index)
 
-    pair = cond do
-      is_error(key) -> error("unusable as hash key: #{Object.type(index)}")
-      true -> Map.get(hash.pairs, key, @cached_null)
-    end
+    pair =
+      cond do
+        is_error(key) -> error("unusable as hash key: #{Object.type(index)}")
+        true -> Map.get(hash.pairs, key, @cached_null)
+      end
 
     case pair do
       %Error{} -> pair
@@ -312,6 +361,7 @@ defmodule Monkey.Evaluator do
     hash = %Hash{pairs: evaluated_pairs}
     {hash, env}
   end
+
   defp eval_hash_pair([pair | rest] = _pairs, env, evaluated_pairs) do
     {key, value} = pair
 
@@ -320,9 +370,15 @@ defmodule Monkey.Evaluator do
     hash_key = Hash.Hashable.hash(key)
 
     cond do
-      is_error(key) -> {key, env}
-      is_error(value) -> {value, env}
-      is_error(hash_key) -> {hash_key, env}
+      is_error(key) ->
+        {key, env}
+
+      is_error(value) ->
+        {value, env}
+
+      is_error(hash_key) ->
+        {hash_key, env}
+
       true ->
         hash_pair = %Hash.Pair{key: key, value: value}
         evaluated_pairs = Map.put(evaluated_pairs, hash_key, hash_pair)
@@ -335,15 +391,15 @@ defmodule Monkey.Evaluator do
     {value, _env} = eval(function.body, extended_env)
     unwrap_return_value(value)
   end
+
   defp apply_function(%Builtin{} = function, args), do: function.fn.(args)
-  defp apply_function(function, _),
-    do: error("not a function: #{Object.type(function)}")
+  defp apply_function(function, _), do: error("not a function: #{Object.type(function)}")
 
   defp extended_function_env(function, args) do
     env = Environment.build_enclosed(function.environment)
     pairs = Enum.zip(function.parameters, args)
 
-    List.foldl(pairs, env, fn({identifier, arg}, env) ->
+    List.foldl(pairs, env, fn {identifier, arg}, env ->
       Environment.set(env, identifier.value, arg)
     end)
   end
@@ -369,6 +425,6 @@ defmodule Monkey.Evaluator do
 
   defp error(message), do: %Error{message: message}
 
-  defp from_native_bool(:true), do: @cached_true
-  defp from_native_bool(:false), do: @cached_false
+  defp from_native_bool(true), do: @cached_true
+  defp from_native_bool(false), do: @cached_false
 end

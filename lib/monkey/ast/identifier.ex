@@ -12,4 +12,3 @@ defmodule Monkey.Ast.Identifier do
     def to_string(identifier), do: identifier.value
   end
 end
-

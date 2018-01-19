@@ -2,7 +2,10 @@ defmodule Monkey.Object.Hash do
   alias Monkey.Object.{Error, Object}
 
   @enforce_keys [:pairs]
-  defstruct [:pairs] # %{Hash.Key, Hash.Pair}
+  defstruct [
+    # %{Hash.Key, Hash.Pair}
+    :pairs
+  ]
 
   defmodule Key do
     @enforce_keys [:type, :value]
@@ -30,11 +33,12 @@ defmodule Monkey.Object.Hash do
     def type(_), do: "HASH"
 
     def inspect(obj) do
-      pairs = obj.pairs
-      |> Enum.map(fn({_key, pair}) ->
-        "#{Object.inspect(pair.key)}:#{Object.inspect(pair.value)}"
-      end)
-      |> Enum.join(", ")
+      pairs =
+        obj.pairs
+        |> Enum.map(fn {_key, pair} ->
+          "#{Object.inspect(pair.key)}:#{Object.inspect(pair.value)}"
+        end)
+        |> Enum.join(", ")
 
       "{#{pairs}}"
     end

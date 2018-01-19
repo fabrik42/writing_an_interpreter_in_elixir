@@ -10,6 +10,6 @@ defmodule Monkey.Ast.BlockStatement do
     def node_type(_), do: :expression
 
     def to_string(expression),
-      do: expression.statements |> Enum.map(&Node.to_string/1) |> Enum.join
+      do: expression.statements |> Enum.map(&Node.to_string/1) |> Enum.join()
   end
 end

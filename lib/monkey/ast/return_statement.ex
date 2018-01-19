@@ -12,6 +12,7 @@ defmodule Monkey.Ast.ReturnStatement do
     def to_string(%{return_value: nil} = statement) do
       Node.token_literal(statement)
     end
+
     def to_string(statement) do
       literal = Node.token_literal(statement)
       value = Node.to_string(statement.return_value)
@@ -19,4 +20,3 @@ defmodule Monkey.Ast.ReturnStatement do
     end
   end
 end
-

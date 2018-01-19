@@ -2,10 +2,13 @@ defmodule Monkey.Ast.FunctionLiteral do
   alias Monkey.Ast.Node
 
   @enforce_keys [:token, :parameters, :body]
-  defstruct [:token,
-             :parameters, # identifier[]
-             :body # block statement
-            ]
+  defstruct [
+    :token,
+    # identifier[]
+    :parameters,
+    # block statement
+    :body
+  ]
 
   defimpl Node, for: __MODULE__ do
     def token_literal(expression), do: expression.token.literal
@@ -15,9 +18,11 @@ defmodule Monkey.Ast.FunctionLiteral do
     def to_string(expression) do
       literal = Node.token_literal(expression)
       body = Node.to_string(expression.body)
-      params = expression.parameters
-      |> Enum.map(&Node.to_string/1)
-      |> Enum.join(", ")
+
+      params =
+        expression.parameters
+        |> Enum.map(&Node.to_string/1)
+        |> Enum.join(", ")
 
       "#{literal}(#{params})#{body}"
     end

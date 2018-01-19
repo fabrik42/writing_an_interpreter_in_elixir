@@ -15,21 +15,23 @@ defmodule Monkey.Evaluator.Builtins do
       %Monkey.Object.String{} ->
         result = String.length(arg.value)
         %Monkey.Object.Integer{value: result}
+
       %Monkey.Object.Array{} ->
         result = length(arg.elements)
         %Monkey.Object.Integer{value: result}
+
       _ ->
         error("argument to `len` not supported, got #{Object.type(arg)}")
     end
   end
-  def len(args),
-    do: error("wrong number of arguments. got=#{length(args)}, want=1")
+
+  def len(args), do: error("wrong number of arguments. got=#{length(args)}, want=1")
 
   def puts(args) do
-    Enum.each(args, fn(arg) ->
+    Enum.each(args, fn arg ->
       arg
-      |> Object.inspect
-      |> IO.puts
+      |> Object.inspect()
+      |> IO.puts()
     end)
 
     %Null{}

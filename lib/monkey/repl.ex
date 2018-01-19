@@ -6,7 +6,7 @@ defmodule Monkey.Repl do
 
   @prompt ">> "
 
-  def loop(env \\ Environment.build) do
+  def loop(env \\ Environment.build()) do
     input = IO.gets(@prompt)
     tokens = Lexer.tokenize(input)
     parser = Parser.from_tokens(tokens)
@@ -15,8 +15,9 @@ defmodule Monkey.Repl do
     case length(parser.errors) do
       0 ->
         {result, env} = Evaluator.eval(program, env)
-        IO.puts Object.inspect(result)
+        IO.puts(Object.inspect(result))
         loop(env)
+
       _ ->
         print_parser_errors(parser.errors)
         loop(env)
@@ -24,8 +25,8 @@ defmodule Monkey.Repl do
   end
 
   defp print_parser_errors(errors) do
-    IO.puts "Woops! We ran into some monkey business here!"
-    IO.puts "Parser Errors:"
+    IO.puts("Woops! We ran into some monkey business here!")
+    IO.puts("Parser Errors:")
     Enum.each(errors, &IO.puts/1)
   end
 end

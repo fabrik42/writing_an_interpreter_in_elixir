@@ -12,10 +12,11 @@ defmodule Monkey.Object.Boolean do
 
   defimpl Hash.Hashable, for: __MODULE__ do
     def hash(obj) do
-      value = case obj.value do
-                :true -> 1
-                :false -> 0
-              end
+      value =
+        case obj.value do
+          true -> 1
+          false -> 0
+        end
 
       %Hash.Key{type: Object.type(obj), value: value}
     end

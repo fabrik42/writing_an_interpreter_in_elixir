@@ -13,4 +13,3 @@ defmodule Monkey.Ast.ExpressionStatement do
     def to_string(statement), do: Node.to_string(statement.expression)
   end
 end
-
