@@ -8,7 +8,7 @@
 
 This project is an interpreter for the [Monkey](https://interpreterbook.com/index.html#the-monkey-programming-language) programming language, featuring its own lexer, AST producing parser, and evaluator. The Monkey programming language as well as the structure of the interpreter are based on the book [Writing An Interpreter In Go](https://interpreterbook.com/). 
 
-I really enjoyed reading this book and following the implementation of the interpreter in Go, because it was built using simple and straightforward patterns. You learn to build an interpreter completely by yourself, with no generators, no external dependencies, just you and your code. :)
+I really enjoyed reading this book and following the implementation of the interpreter in Go, because it was built using simple and straightforward patterns. You learn to build an interpreter completely by yourself, without generators, no external dependencies, just you and your code. :)
 
 And even though - at first sight - an interpreter seems to be a big, hairy, complex machine, the author manages to implement a fully working version using easy to understand code.
 
