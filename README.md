@@ -6,17 +6,17 @@
 
 ## Introduction
 
-This project is an interpreter for the [Monkey](https://interpreterbook.com/index.html#the-monkey-programming-language) programming language, featuring its own lexer, AST producing parser and evaluator. The Monkey programming language as well as the structure of the interpreter are based on the book [Writing An Interpreter In Go](https://interpreterbook.com/). 
+This project is an interpreter for the [Monkey](https://interpreterbook.com/index.html#the-monkey-programming-language) programming language, featuring its own lexer, AST producing parser, and evaluator. The Monkey programming language as well as the structure of the interpreter are based on the book [Writing An Interpreter In Go](https://interpreterbook.com/). 
 
-I really enjoyed reading this book and following the implementation of the interpreter in Go, because it was built using simple and straightforward patterns. You learn to build an interpreter completely by yourself, no generators, no external dependencies, just you and your code. :)
+I really enjoyed reading this book and following the implementation of the interpreter in Go, because it was built using simple and straightforward patterns. You learn to build an interpreter completely by yourself, with no generators, no external dependencies, just you and your code. :)
 
 And even though - at first sight - an interpreter seems to be a big, hairy, complex machine, the author manages to implement a fully working version using easy to understand code.
 
-Patterns like early returns, simple for-loops and small amounts of well encapsulated state are well known to most programmers and easy to reason about.
+Patterns like early returns, simple for-loops, and small amounts of well-encapsulated state are well known to most programmers and easy to reason about.
 
 However, none of these things exist in Elixir and I was looking to get my hands dirty with this language. So I decided to implement the interpreter for Monkey in Elixir instead of Go, to see which other patterns can be applied to solve the problems with a more functional approach.
 
-I know that there are way more sophisticated patterns in functional languages, like monads, but I wanted to solve this problem using only the standard lib of Elixir. First of all, because the reference implementation in Golang did the same and second, because I wanted to dive deeper into the standard lib.
+I know that there are way more sophisticated patterns in functional languages, like monads, but I wanted to solve this problem using only the standard lib of Elixir. First of all, because the reference implementation in Golang did the same, and second, because I wanted to dive deeper into the standard lib.
 
 It is important to keep in mind, that the whole basic structure of the interpreter is derived from the original Golang book. So maybe there are even better ways to lay out an interpreter in Elixir. If this is the case, let me know! :)
 
@@ -72,4 +72,4 @@ mix test
 * Check code quality, Elixir ways of doing things
 * Add Typespecs and Dialyzer for static analysis
 * Try to remove TODOs aka nested conditions
-* Maybe more builtin functions
+* Maybe more built-in functions
